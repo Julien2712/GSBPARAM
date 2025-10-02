@@ -1,0 +1,125 @@
+\doxysection{Modele\+Front Class Reference}
+\hypertarget{class_modele_front}{}\label{class_modele_front}\index{ModeleFront@{ModeleFront}}
+
+
+contient les fonctions d\textquotesingle{}accès aux infos de la BD pour les utilisateurs  
+
+
+Inheritance diagram for Modele\+Front\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_modele_front}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_modele_front_a7dbb1b18a0595e47be50344fdc117ff5}{get\+Les\+Categories}} ()
+\item 
+\mbox{\hyperlink{class_modele_front_abe2e7e466345ae4ee73c3731982361aa}{get\+Les\+Infos\+Categorie}} (\$id\+Categorie)
+\item 
+\mbox{\hyperlink{class_modele_front_a89d69a70c672e0962deab06c8fd9d9dc}{get\+Les\+Produits\+De\+Categorie}} (\$id\+Categorie)
+\item 
+\mbox{\hyperlink{class_modele_front_a1342e677e5e09f15e9638db022b664cc}{get\+Les\+Produits\+Du\+Tableau}} (\$des\+Ids\+Produit=null)
+\item 
+\mbox{\hyperlink{class_modele_front_aac5ffde0f104dadc1553235381797767}{creer\+Commande}} (\$nom, \$rue, \$cp, \$ville, \$mail, \$les\+Id\+Produit)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_modele}{Modele}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_modele_a2fe407712b9a72eecac1615d934df767}{executer\+Requete}} (\$sql, \$params=null)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+contient les fonctions d\textquotesingle{}accès aux infos de la BD pour les utilisateurs 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_modele_front_aac5ffde0f104dadc1553235381797767}\label{class_modele_front_aac5ffde0f104dadc1553235381797767} 
+\index{ModeleFront@{ModeleFront}!creerCommande@{creerCommande}}
+\index{creerCommande@{creerCommande}!ModeleFront@{ModeleFront}}
+\doxysubsubsection{\texorpdfstring{creerCommande()}{creerCommande()}}
+{\footnotesize\ttfamily creer\+Commande (\begin{DoxyParamCaption}\item[{}]{\$nom,  }\item[{}]{\$rue,  }\item[{}]{\$cp,  }\item[{}]{\$ville,  }\item[{}]{\$mail,  }\item[{}]{\$les\+Id\+Produit }\end{DoxyParamCaption})}
+
+Crée une commande
+
+Crée une commande à partir des arguments validés passés en paramètre, l\textquotesingle{}identifiant est construit à partir du maximum existant ; crée les lignes de commandes dans la table contenir à partir du tableau d\textquotesingle{}id\+Produit passé en paramètre 
+\begin{DoxyParams}[1]{Parameters}
+string & {\em \$nom} & nom du client \\
+\hline
+string & {\em \$rue} & rue du client \\
+\hline
+string & {\em \$cp} & cp du client \\
+\hline
+string & {\em \$ville} & ville du client \\
+\hline
+string & {\em \$mail} & mail du client \\
+\hline
+array & {\em \$les\+Id\+Produit} & tableau contenant les id des produits commandés \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_modele_front_a7dbb1b18a0595e47be50344fdc117ff5}\label{class_modele_front_a7dbb1b18a0595e47be50344fdc117ff5} 
+\index{ModeleFront@{ModeleFront}!getLesCategories@{getLesCategories}}
+\index{getLesCategories@{getLesCategories}!ModeleFront@{ModeleFront}}
+\doxysubsubsection{\texorpdfstring{getLesCategories()}{getLesCategories()}}
+{\footnotesize\ttfamily get\+Les\+Categories (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Retourne toutes les catégories
+
+\begin{DoxyReturn}{Returns}
+array \$les\+Lignes le tableau des catégories (tableau d\textquotesingle{}objets) 
+\end{DoxyReturn}
+\Hypertarget{class_modele_front_abe2e7e466345ae4ee73c3731982361aa}\label{class_modele_front_abe2e7e466345ae4ee73c3731982361aa} 
+\index{ModeleFront@{ModeleFront}!getLesInfosCategorie@{getLesInfosCategorie}}
+\index{getLesInfosCategorie@{getLesInfosCategorie}!ModeleFront@{ModeleFront}}
+\doxysubsubsection{\texorpdfstring{getLesInfosCategorie()}{getLesInfosCategorie()}}
+{\footnotesize\ttfamily get\+Les\+Infos\+Categorie (\begin{DoxyParamCaption}\item[{}]{\$id\+Categorie }\end{DoxyParamCaption})}
+
+Retourne toutes les informations d\textquotesingle{}une catégorie passée en paramètre
+
+
+\begin{DoxyParams}[1]{Parameters}
+string & {\em \$id\+Categorie} & l\textquotesingle{}id de la catégorie \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+object \$la\+Ligne la catégorie (objet) 
+\end{DoxyReturn}
+\Hypertarget{class_modele_front_a89d69a70c672e0962deab06c8fd9d9dc}\label{class_modele_front_a89d69a70c672e0962deab06c8fd9d9dc} 
+\index{ModeleFront@{ModeleFront}!getLesProduitsDeCategorie@{getLesProduitsDeCategorie}}
+\index{getLesProduitsDeCategorie@{getLesProduitsDeCategorie}!ModeleFront@{ModeleFront}}
+\doxysubsubsection{\texorpdfstring{getLesProduitsDeCategorie()}{getLesProduitsDeCategorie()}}
+{\footnotesize\ttfamily get\+Les\+Produits\+De\+Categorie (\begin{DoxyParamCaption}\item[{}]{\$id\+Categorie }\end{DoxyParamCaption})}
+
+Retourne sous forme d\textquotesingle{}un tableau tous les produits de la catégorie passée en argument
+
+
+\begin{DoxyParams}[1]{Parameters}
+string & {\em \$id\+Categorie} & l\textquotesingle{}id de la catégorie dont on veut les produits \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+array \$les\+Lignes un tableau des produits de la categ passée en paramètre (tableau d\textquotesingle{}objets) 
+\end{DoxyReturn}
+\Hypertarget{class_modele_front_a1342e677e5e09f15e9638db022b664cc}\label{class_modele_front_a1342e677e5e09f15e9638db022b664cc} 
+\index{ModeleFront@{ModeleFront}!getLesProduitsDuTableau@{getLesProduitsDuTableau}}
+\index{getLesProduitsDuTableau@{getLesProduitsDuTableau}!ModeleFront@{ModeleFront}}
+\doxysubsubsection{\texorpdfstring{getLesProduitsDuTableau()}{getLesProduitsDuTableau()}}
+{\footnotesize\ttfamily get\+Les\+Produits\+Du\+Tableau (\begin{DoxyParamCaption}\item[{}]{\$des\+Ids\+Produit = {\ttfamily null} }\end{DoxyParamCaption})}
+
+Retourne les produits concernés par le tableau des id\+Produits passé en argument (si null retourne tous les produits)
+
+
+\begin{DoxyParams}[1]{Parameters}
+array & {\em \$des\+Ids\+Produit} & tableau d\textquotesingle{}id\+Produits \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+array \$les\+Produits un tableau contenant les infos des produits dont les id ont été passé en paramètre 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+modele/\mbox{\hyperlink{_modele_front_8php}{Modele\+Front.\+php}}\end{DoxyCompactItemize}
