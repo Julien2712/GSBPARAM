@@ -88,6 +88,19 @@ class ControleurGererPanier{
 		$this->voirPanier();
 	}
 		
+/*
+ Supprime un produit du panier
+ */
+function supprimerProduitDuPanier($idProduit)
+{
+    if(($key = array_search($idProduit, $_SESSION['produits'])) !== false) {
+        unset($_SESSION['produits'][$key]);
+        $_SESSION['produits'] = array_values($_SESSION['produits']);
+    }
+    $this->voirPanier();
+}
+
+
 	/**
 	 * Retourne les produits du panier
 	 *
@@ -166,7 +179,8 @@ class ControleurGererPanier{
 	 */
 	function supprimerPanier()
 	{
-		unset($_SESSION['produits']);
+    	unset($_SESSION['produits']);
+   		$this->voirPanier();
 	}
 	/**
 	 * teste si une chaîne a un format de code postal

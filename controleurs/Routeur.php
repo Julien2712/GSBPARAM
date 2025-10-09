@@ -47,9 +47,11 @@ class Routeur{
                 case null :
                 case 'voirPanier' : {$this->ctrlGererPanier->voirPanier();break;}
                 case 'ajouterAuPanier' : {$this->ctrlGererPanier->ajouterAuPanier($_REQUEST['produit']);break;}
+                case 'supprimerUnProduit' : {$this->ctrlGererPanier->supprimerProduitDuPanier($_REQUEST['produit']);break;}
                 case 'viderPanier' : {$this->ctrlGererPanier->viderPanier();break;}
                 case 'passerCommande' : $this->ctrlGererPanier->passerCommande();break;
                 case 'confirmerCommande' : $this->ctrlGererPanier->confirmerCommande();break;
+                case 'viderPanier' : {$this->ctrlGererPanier->supprimerPanier();break;}
                 default: {$this->ctrlGererPanier->voirPanier();break;}
             }; break;
         case 'administrer' :  // TODO Créer un contrôleur spécial pour l'administration du site
