@@ -1,5 +1,8 @@
-﻿<div id="creationCommande">
+<div id="creationCommande">
 <div class="contenuCentre">
+<?php if (!empty($erreur)): ?>
+  <div class="alert alert-danger" role="alert"><?= htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8') ?></div>
+<?php endif; ?>
 <form method="POST" action="index.php?uc=gererPanier&action=confirmerCommande" id="formC">
 <div class="mb-3 row">
     <label for="nom" class="col-sm-2 col-form-label">Nom prénom*</label>
@@ -28,7 +31,7 @@
   <div class="mb-3 row">
     <label for="mail" class="col-sm-2 col-form-label">Mail* </label>
     <div class="col-sm-10">
-      <input type="mail" class="form-control" id="mail" name="mail" value="<?= $mail ?>">
+      <input type="email" class="form-control" id="mail" name="mail" value="<?= $mail ?>" required>
     </div>
   </div>
   <div class="btnCentre">

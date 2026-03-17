@@ -1,61 +1,83 @@
 <?php
-require_once 'controleurs/ControleurVoirProduits.php';
-require_once 'controleurs/ControleurAccueil.php';
-require_once 'controleurs/ControleurGererPanier.php';
-/**
- * @class Routeur
- * @brief gère les routes (actions à exécuter en fonction des urls)
- */
+$ctrlDir = __DIR__;
+require_once $ctrlDir . '/ControleurVoirProduits.php';
+require_once $ctrlDir . '/ControleurAccueil.php';
+require_once $ctrlDir . '/ControleurGererPanier.php';
+
+// vérification explicite avant require
+if (!is_file($ctrlDir . '/ControleurUtilisateur.php')) {
+    die('Fichier manquant: ' . $ctrlDir . '/ControleurUtilisateur.php');
+}
+require_once $ctrlDir . '/ControleurUtilisateur.php';
+
 class Routeur{
-    
     private $ctrlVoirProduits;
     private $ctrlAccueil;
     private $ctrlGererPanier;
-    
+    private $ctrlUtilisateur;
+
     public function __construct(){
-        
-        $this->ctrlVoirProduits=new ControleurVoirProduits();
-        $this->ctrlAccueil=new ControleurAccueil();
-        $this->ctrlGererPanier=new ControleurGererPanier();
+        $this->ctrlVoirProduits = new ControleurVoirProduits();
+        $this->ctrlAccueil = new ControleurAccueil();
+        $this->ctrlGererPanier = new ControleurGererPanier();
+        $this->ctrlUtilisateur = new ControleurUtilisateur();
     }
-    /** recupère les paramètres de l'url et active les contrôleurs nécessaires
-    */
+
     public function routerRequete()
     {
-    // traitement des paramètres de l'url
-    if(isset($_REQUEST['uc']))
-        $uc = $_REQUEST['uc'];
-        else $uc='accueil';
-    if(isset($_REQUEST['action']))
-        $action = $_REQUEST['action'];
-    else $action=null;
-    switch($uc)
-    {
-        case 'accueil':
-            $this->ctrlAccueil->accueil();break;
-        case 'voirProduits' :
-            switch ($action)
-            {
-                case null :
-                case 'voirCategories' : {$this->ctrlVoirProduits->voirProduits(null); break;}
-                case 'voirProduits' : {$this->ctrlVoirProduits->voirProduits($_REQUEST['categorie']);break;}
-                case 'nosProduits' : {$this->ctrlVoirProduits->voirTousLesProduits(); break;} // AJOUT
-            }; break;
-        case 'gererPanier' :
-            switch ($action)
-            {
-                case null :
-                case 'voirPanier' : {$this->ctrlGererPanier->voirPanier();break;}
-                case 'ajouterAuPanier' : {$this->ctrlGererPanier->ajouterAuPanier($_REQUEST['produit']);break;}
-                case 'supprimerUnProduit' : {$this->ctrlGererPanier->supprimerProduitDuPanier($_REQUEST['produit']);break;}
-                case 'viderPanier' : {$this->ctrlGererPanier->viderPanier();break;}
-                case 'passerCommande' : $this->ctrlGererPanier->passerCommande();break;
-                case 'confirmerCommande' : $this->ctrlGererPanier->confirmerCommande();break;
-                case 'viderPanier' : {$this->ctrlGererPanier->supprimerPanier();break;}
-                default: {$this->ctrlGererPanier->voirPanier();break;}
-            }; break;
-        case 'administrer' :  // TODO Créer un contrôleur spécial pour l'administration du site
-        break; 
-    }
+        if(isset($_REQUEST['uc'])) $uc = $_REQUEST['uc']; else $uc='accueil';
+        if(isset($_REQUEST['action'])) $action = $_REQUEST['action']; else $action=null;
+
+        switch($uc)
+        {
+            case 'accueil':
+                $this->ctrlAccueil->accueil();break;
+
+            case 'voirProduits' :
+                switch ($action)
+                {
+                    case null :
+                    case 'voirCategories' : {$this->ctrlVoirProduits->voirProduits(null); break;}
+                    case 'voirProduits' : {$this->ctrlVoirProduits->voirProduits($_REQUEST['categorie']);break;}
+                    case 'nosProduits' : {$this->ctrlVoirProduits->voirTousLesProduits(); break;}
+                }; break;
+
+            case 'gererPanier' :
+                switch ($action)
+                {
+                    case null :
+                    case 'voirPanier' : {$this->ctrlGererPanier->voirPanier();break;}
+                    case 'ajouterAuPanier' : {
+                        $q = isset($_REQUEST['quantite']) ? $_REQUEST['quantite'] : 1;
+                        $this->ctrlGererPanier->ajouterAuPanier($_REQUEST['produit'], $q);break;
+                    }
+                    case 'mettreAJourQuantite' : {
+                        $q = isset($_REQUEST['quantite']) ? $_REQUEST['quantite'] : 0;
+                        // accepter POST aussi
+                        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quantite'])) $q = $_POST['quantite'];
+                        $this->ctrlGererPanier->mettreAJourQuantite($_REQUEST['produit'], $q);break;
+                    }
+                    case 'supprimerUnProduit' : {$this->ctrlGererPanier->supprimerProduitDuPanier($_REQUEST['produit']);break;}
+                    case 'viderPanier' : {$this->ctrlGererPanier->viderPanier();break;}
+                    case 'passerCommande' : $this->ctrlGererPanier->passerCommande();break;
+                    case 'confirmerCommande' : $this->ctrlGererPanier->confirmerCommande();break;
+                    default: {$this->ctrlGererPanier->voirPanier();break;}
+                }; break;
+
+            case 'utilisateur' :
+                switch ($action)
+                {
+                    case 'connexion' : {$this->ctrlUtilisateur->afficherConnexion(); break;}
+                    case 'seConnecter' : {$this->ctrlUtilisateur->seConnecter(); break;}
+                    case 'deconnexion' : {$this->ctrlUtilisateur->deconnecter(); break;}
+                    case 'inscription' : {$this->ctrlUtilisateur->afficherInscription(); break;}
+                    case 'creerCompte' : {$this->ctrlUtilisateur->creerCompte(); break;}
+                    default: {$this->ctrlUtilisateur->afficherConnexion(); break;}
+                }; break;
+
+            case 'administrer' :
+                break;
+        }
     }
 }
+?>

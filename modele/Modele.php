@@ -35,7 +35,7 @@ return $result;
  * getBdd fournit un objet Pdo $bdd
  * pour effectuer ensuite des requêtes
 */
-private function getBdd() {
+protected function getBdd(){
     require_once('config/.config.php');
     try {
         if ($this->bdd==null)

@@ -7,7 +7,7 @@
  * @version    3.0
  * @details contient les fonctions d'accès BD pour le FrontEnd
  */
-require_once 'Modele.php';
+require_once __DIR__ . '/Modele.php';
 /**
  * @class ModeleFront
  * @brief contient les fonctions d'accès aux infos de la BD pour les utilisateurs
@@ -139,8 +139,9 @@ class ModeleFront extends Modele{
 		$date = date('Y/m/d'); // récupération de la date système
 		$req = "insert into commande values ('$idCommande','$date','$nom','$rue','$cp','$ville','$mail')";
 		$res = $this->executerRequete($req);
-		// insertion produits commandés
-		foreach($lesIdProduit as $unIdProduit)
+		// insertion produits commandés (on dédoublonne pour éviter l'erreur de clé primaire)
+		$lesIdProduitUniques = array_unique($lesIdProduit);
+		foreach($lesIdProduitUniques as $unIdProduit)
 		{
 			$req = "insert into contenir values ('$idCommande','$unIdProduit')";
 			$res = $this->executerRequete($req);
@@ -152,6 +153,92 @@ class ModeleFront extends Modele{
         die();
 		}
 	}
+    /**
+     * Récupère un utilisateur par login
+     */
+    public function getUserByLogin($login)
+    {
+        try {
+            $req = 'SELECT id, login, motdepasse, nom, mail FROM utilisateur WHERE login = :login';
+            $stmt = $this->getBdd()->prepare($req);
+            $stmt->bindParam(':login', $login, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            print "Erreur !: " . $e->getMessage();
+            die();
+        }
+    }
 
+    /**
+     * Crée un utilisateur (login unique)
+     */
+    public function creerUtilisateur($login, $hashMdp, $nom, $mail)
+    {
+        try {
+            $req = 'INSERT INTO utilisateur (login, motdepasse, nom, mail) VALUES (:login, :mdp, :nom, :mail)';
+            $stmt = $this->getBdd()->prepare($req);
+            $stmt->bindParam(':login', $login, PDO::PARAM_STR);
+            $stmt->bindParam(':mdp', $hashMdp, PDO::PARAM_STR);
+            $stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
+            $stmt->bindParam(':mail', $mail, PDO::PARAM_STR);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            print "Erreur !: " . $e->getMessage();
+            die();
+        }
+    }
+
+    /**
+     * Vérifie les identifiants, retourne l'utilisateur (objet) ou false
+     */
+    public function verifierUtilisateur($login, $motdepasse)
+    {
+        $user = $this->getUserByLogin($login);
+        if ($user && isset($user->motdepasse) && password_verify($motdepasse, $user->motdepasse)) {
+            // ne renvoyer que les infos utiles (éviter le mot de passe)
+            unset($user->motdepasse);
+            return $user;
+        }
+        return false;
+    }
+    /**
+     * Récupère le panier (tableau associatif idProduit => quantite) pour un utilisateur
+     */
+    public function getPanierUtilisateur($idUser)
+    {
+        try {
+            $req = 'SELECT panier FROM utilisateur WHERE id = :id';
+            $stmt = $this->getBdd()->prepare($req);
+            $stmt->bindParam(':id', $idUser, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$row || empty($row['panier'])) return [];
+            $data = json_decode($row['panier'], true);
+            return is_array($data) ? $data : [];
+        } catch (PDOException $e) {
+            // gérer/logguer l'erreur correctement en prod
+            return [];
+        }
+    }
+
+    /**
+     * Sauvegarde le panier (assoc id=>quantité) pour un utilisateur
+     */
+    public function sauvegarderPanierUtilisateur($idUser, array $panierAssoc)
+    {
+        try {
+            $json = json_encode($panierAssoc);
+            $req = 'UPDATE utilisateur SET panier = :panier WHERE id = :id';
+            $stmt = $this->getBdd()->prepare($req);
+            $stmt->bindParam(':panier', $json, PDO::PARAM_STR);
+            $stmt->bindParam(':id', $idUser, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            // gérer/logguer l'erreur correctement en prod
+            return false;
+        }
+    }
 }
 ?>

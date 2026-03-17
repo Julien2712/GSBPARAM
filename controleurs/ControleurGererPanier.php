@@ -1,271 +1,246 @@
-﻿<?php
-/**
- * Mission GsbParam PHP Objet
- * 
- * @file ControleurGererPanier.php
- * @author Marielle Jouin <jouin.marielle@gmail.com>
- * @version    3.0
- * @brief contient les fonctions pour gérer le panier
+<?php
+require_once __DIR__ . '/../modele/ModeleFront.php';
 
- * regroupe les fonctions pour gérer le panier, et les erreurs de saisie dans le formulaire de commande
-*/
-/**
- * @class ControleurGererPanier
- * @brief contient les fonctions pour gérer le panier
- */
-class ControleurGererPanier{
-	private $modeleFront;
-	
-	public function __construct()
-    {
-        $this->modeleFront=new ModeleFront();
-		$this->initPanier();
-    }
-	/**
-	 * Initialise le panier
-	 *
-	 * Crée un tableau $_SESSION['produits'] en session dans le cas
-	 * où il n'existe pas déjà
-	*/
-	function initPanier()
-	{
-		if(!isset($_SESSION['produits']))
-		{
-			$_SESSION['produits']= array();
-		}
-	}
-	/**
-	 * Voir le panier
-	 *
-	 * permet d'afficher les produits contenus dans le panier
-	 * leur descriptif est récupéré grâce à chaque id par getLesProduitsDuTableau()
-	*/
-	function voirPanier()
-		{
-			$n=$this->nbProduitsDuPanier();
-			if($n >0)
-			{
-				$desIdProduit = $this->getLesIdProduitsDuPanier();
-				$lesProduitsDuPanier = $this->modeleFront->getLesProduitsDuTableau($desIdProduit);
-				include("vues/v_panier.php");
-			}
-			else
-			{
-				$message = "Le panier est vide !";
-				include ("vues/v_message.php");
-			}
-		}
-
-	/**
-	 * Vide le panier
-	 *
-	 * Supprime le tableau $_SESSION['produits']
-	 */
-	function viderPanier()
-	{
-		unset($_SESSION['produits']);
-	}
-	/**
-	 * Ajoute un produit au panier
-	 *
-	 * Teste si le produit est déjà dans la variable session 
-	 * ajoute le produit à la variable de session dans le cas où
-	 * où le produit n'a pas été trouvé
-	 
-	* @param Produit $idProduit Le produit à ajouter au panier 
-	*/
-	function ajouterAuPanier($idProduit)
-	{
-		if(in_array($idProduit,$_SESSION['produits']))
-		{
-			$msgErreurs[]='Ce produit est déjà dans le panier.';
-			include("vues/v_erreurs.php");
-		}
-		else
-		{
-			$_SESSION['produits'][]= $idProduit; // l'indice n'est pas précisé : il sera automatiquement mis à la fin
-		}
-		$this->voirPanier();
-	}
-		
-/*
- Supprime un produit du panier
- */
-function supprimerProduitDuPanier($idProduit)
+class ControleurGererPanier
 {
-    if(($key = array_search($idProduit, $_SESSION['produits'])) !== false) {
-        unset($_SESSION['produits'][$key]);
-        $_SESSION['produits'] = array_values($_SESSION['produits']);
+    private $modeleFront;
+
+    public function __construct()
+    {
+        if (session_status() === PHP_SESSION_NONE)
+            session_start();
+        $this->modeleFront = new ModeleFront();
+        $this->initPanier();
+        // si utilisateur connecté, fusionner le panier DB avec celui en session (une seule fois par session)
+        if (!empty($_SESSION['utilisateur']->id) && empty($_SESSION['panier_fusionne'])) {
+            $this->chargerEtFusionnerPanierUtilisateur($_SESSION['utilisateur']->id);
+            $_SESSION['panier_fusionne'] = true;
+        }
     }
-    $this->voirPanier();
+
+    // initialise le panier au format associatif id => quantite
+    private function initPanier()
+    {
+        if (!isset($_SESSION['produits']) || !is_array($_SESSION['produits'])) {
+            $_SESSION['produits'] = [];
+            return;
+        }
+        // si format ancien (liste numérique d'ids), convertir en associative
+        $isList = array_values($_SESSION['produits']) === $_SESSION['produits'];
+        if ($isList) {
+            $assoc = [];
+            foreach ($_SESSION['produits'] as $id) {
+                $id = (string) $id;
+                if (isset($assoc[$id]))
+                    $assoc[$id]++;
+                else
+                    $assoc[$id] = 1;
+            }
+            $_SESSION['produits'] = $assoc;
+        }
+    }
+
+    // affiche le panier (une carte par produit)
+    public function voirPanier()
+    {
+        $n = $this->nbProduitsDuPanier();
+        if ($n > 0) {
+            $idsUniques = array_keys($_SESSION['produits']); // id => quantite
+            $lesProduitsDuPanier = $this->modeleFront->getLesProduitsDuTableau($idsUniques);
+            $lesQuantites = $_SESSION['produits'];
+            include(__DIR__ . '/../vues/v_panier.php');
+        } else {
+            $message = "Le panier est vide !";
+            include(__DIR__ . '/../vues/v_message.php');
+        }
+    }
+
+    public function ajouterAuPanier($idProduit, $quantite = 1)
+    {
+        $this->initPanier();
+        $id = (string) $idProduit;
+        // toujours incrémenter de 1 par défaut — traiter quantite comme "delta" seulement si c'est ±1
+        $q = 1;
+        if (isset($_REQUEST['quantite']) && is_numeric($_REQUEST['quantite'])) {
+            $val = (int) $_REQUEST['quantite'];
+            if ($val === 1 || $val === -1) {
+                $q = $val;
+            }
+        }
+        if (isset($_SESSION['produits'][$id])) {
+            $_SESSION['produits'][$id] = (int) $_SESSION['produits'][$id] + $q;
+        } else {
+            $_SESSION['produits'][$id] = max(0, $q);
+        }
+        $this->sauvegarderPanierUtilisateurSiConnecte();
+        $this->voirPanier();
+    }
+
+    // met à jour la quantité (si q <= 0, supprime)
+    public function mettreAJourQuantite($idProduit, $quantite)
+    {
+        $this->initPanier();
+        $id = (string) $idProduit;
+        $q = max(0, (int) $quantite);
+        if ($q > 0) {
+            $_SESSION['produits'][$id] = $q;
+        } else {
+            unset($_SESSION['produits'][$id]);
+        }
+        $this->sauvegarderPanierUtilisateurSiConnecte();
+        $this->voirPanier();
+    }
+
+    // supprime entièrement un produit
+    public function supprimerProduitDuPanier($idProduit)
+    {
+        $this->initPanier();
+        $id = (string) $idProduit;
+        if (isset($_SESSION['produits'][$id])) {
+            unset($_SESSION['produits'][$id]);
+        }
+        $this->sauvegarderPanierUtilisateurSiConnecte();
+        $this->voirPanier();
+    }
+
+    // vide le panier
+    public function viderPanier()
+    {
+        $_SESSION['produits'] = [];
+        $this->sauvegarderPanierUtilisateurSiConnecte();
+        $this->voirPanier();
+    }
+
+    // renvoie un tableau d'ids répétés (utile pour la création de commande si attendu)
+    public function getLesIdProduitsDuPanier()
+    {
+        $result = [];
+        if (!isset($_SESSION['produits']) || !is_array($_SESSION['produits']))
+            return $result;
+        foreach ($_SESSION['produits'] as $id => $q) {
+            for ($i = 0; $i < (int) $q; $i++)
+                $result[] = $id;
+        }
+        return $result;
+    }
+
+    // nombre total d'articles (somme des quantités)
+    public function nbProduitsDuPanier()
+    {
+        $n = 0;
+        if (isset($_SESSION['produits']) && is_array($_SESSION['produits'])) {
+            foreach ($_SESSION['produits'] as $q)
+                $n += (int) $q;
+        }
+        return $n;
+    }
+
+    // --- gestion du panier lié à l'utilisateur en base ---
+
+    // fusionne le panier DB dans la session (additionne les quantités) et sauvegarde
+    private function chargerEtFusionnerPanierUtilisateur($idUser)
+    {
+        if (!method_exists($this->modeleFront, 'getPanierUtilisateur'))
+            return;
+        $dbPanier = $this->modeleFront->getPanierUtilisateur($idUser);
+        if (!is_array($dbPanier))
+            $dbPanier = [];
+        foreach ($dbPanier as $pid => $q) {
+            $pid = (string) $pid;
+            $q = max(0, (int) $q);
+            if ($q <= 0)
+                continue;
+            if (isset($_SESSION['produits'][$pid])) {
+                $_SESSION['produits'][$pid] = (int) $_SESSION['produits'][$pid] + $q;
+            } else {
+                $_SESSION['produits'][$pid] = $q;
+            }
+        }
+        $this->sauvegarderPanierUtilisateurSiConnecte();
+    }
+
+    // sauvegarde en base si utilisateur connecté
+    private function sauvegarderPanierUtilisateurSiConnecte()
+    {
+        if (empty($_SESSION['utilisateur']->id))
+            return;
+        if (!method_exists($this->modeleFront, 'sauvegarderPanierUtilisateur'))
+            return;
+        $this->modeleFront->sauvegarderPanierUtilisateur($_SESSION['utilisateur']->id, $_SESSION['produits']);
+    }
+
+    // affiche le formulaire de commande (pré-rempli si utilisateur connecté)
+    public function passerCommande()
+    {
+        if ($this->nbProduitsDuPanier() === 0) {
+            $message = "Votre panier est vide, vous ne pouvez pas commander.";
+            include(__DIR__ . '/../vues/v_message.php');
+            return;
+        }
+        // pré-remplissage avec les infos de l'utilisateur connecté
+        $nom = !empty($_SESSION['utilisateur']->nom) ? htmlspecialchars($_SESSION['utilisateur']->nom, ENT_QUOTES, 'UTF-8') : '';
+        $mail = !empty($_SESSION['utilisateur']->mail) ? htmlspecialchars($_SESSION['utilisateur']->mail, ENT_QUOTES, 'UTF-8') : '';
+        $rue = '';
+        $cp = '';
+        $ville = '';
+        include(__DIR__ . '/../vues/v_commande.php');
+    }
+
+    // traite le formulaire de commande et enregistre en base
+    public function confirmerCommande()
+    {
+        $nom = isset($_POST['nom']) ? trim($_POST['nom']) : '';
+        $rue = isset($_POST['rue']) ? trim($_POST['rue']) : '';
+        $cp = isset($_POST['cp']) ? trim($_POST['cp']) : '';
+        $ville = isset($_POST['ville']) ? trim($_POST['ville']) : '';
+        $mail = isset($_POST['mail']) ? trim($_POST['mail']) : '';
+
+        // validation simple
+        if (empty($nom) || empty($rue) || empty($cp) || empty($ville) || empty($mail)) {
+            $nom = htmlspecialchars($nom, ENT_QUOTES, 'UTF-8');
+            $rue = htmlspecialchars($rue, ENT_QUOTES, 'UTF-8');
+            $cp = htmlspecialchars($cp, ENT_QUOTES, 'UTF-8');
+            $ville = htmlspecialchars($ville, ENT_QUOTES, 'UTF-8');
+            $mail = htmlspecialchars($mail, ENT_QUOTES, 'UTF-8');
+            $erreur = "Tous les champs sont obligatoires.";
+            include(__DIR__ . '/../vues/v_commande.php');
+            return;
+        }
+
+        // validation de l'email
+        if (strpos($mail, '@') === false) {
+            $nom = htmlspecialchars($nom, ENT_QUOTES, 'UTF-8');
+            $rue = htmlspecialchars($rue, ENT_QUOTES, 'UTF-8');
+            $cp = htmlspecialchars($cp, ENT_QUOTES, 'UTF-8');
+            $ville = htmlspecialchars($ville, ENT_QUOTES, 'UTF-8');
+            $mail = htmlspecialchars($mail, ENT_QUOTES, 'UTF-8');
+            $erreur = "L'adresse e-mail doit obligatoirement contenir un '@'.";
+            include(__DIR__ . '/../vues/v_commande.php');
+            return;
+        }
+
+        if ($this->nbProduitsDuPanier() === 0) {
+            $message = "Votre panier est vide, impossible de passer commande.";
+            include(__DIR__ . '/../vues/v_message.php');
+            return;
+        }
+
+        $lesIdProduit = $this->getLesIdProduitsDuPanier();
+        $this->modeleFront->creerCommande(
+            htmlspecialchars($nom, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($rue, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($cp, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($ville, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($mail, ENT_QUOTES, 'UTF-8'),
+            $lesIdProduit
+        );
+
+        // vider le panier après commande
+        $_SESSION['produits'] = [];
+        $this->sauvegarderPanierUtilisateurSiConnecte();
+
+        $message = "Votre commande a bien été enregistrée. Merci !";
+        include(__DIR__ . '/../vues/v_message.php');
+    }
 }
-
-
-	/**
-	 * Retourne les produits du panier
-	 *
-	 * Retourne le tableau des identifiants de modeleFront
-	 
-	* @return array $_SESSION['produits'] le tableau des id produits du panier 
-	*/
-	function getLesIdProduitsDuPanier()
-	{
-		return $_SESSION['produits'];
-
-	}
-	/**
-	 * Retourne le nombre de produits du panier
-	 *
-	 * Teste si la variable de session existe
-	 * et retourne le nombre d'éléments de la variable session
-	 
-	* @return int $n
-	*/
-	function nbProduitsDuPanier()
-	{
-		$n = 0;
-		if(isset($_SESSION['produits']))
-		{
-		$n = count($_SESSION['produits']);
-		}
-		return $n;
-	}
-	/**
-	 * Affiche le formulaire de commande
-	*/
-	function passerCommande()
-	{
-		$n=$this->nbProduitsDuPanier();
-			if($n>0)
-			{   // les variables suivantes servent à l'affectation des attributs value du formulaire
-				// ici le formulaire doit être vide, quand il est erroné, le formulaire sera réaffiché pré-rempli
-				$nom ='';$rue='';$ville ='';$cp='';$mail='';
-				include ("vues/v_commande.php");
-			}
-			else
-			{
-				$message = "Votre panier est vide !";
-				include ("vues/v_message.php");
-			}
-	}
-	/**
-	 * Traite les informations du formulaire de commande
-	 *
-	 * si les informations sont OK : enregistre la commande et son contenu
-	 * sinon affiche les erreurs de saisie et le formulaire vide
-	*/
-	function confirmerCommande()
-		{
-			$nom =$_REQUEST['nom'];$rue=$_REQUEST['rue'];$ville =$_REQUEST['ville'];$cp=$_REQUEST['cp'];$mail=$_REQUEST['mail'];
-			$msgErreurs = $this->getErreursSaisieCommande($nom,$rue,$ville,$cp,$mail);
-			if (count($msgErreurs)!=0)
-			{
-				include ("vues/v_erreurs.php");
-				include ("vues/v_commande.php");
-			}
-			else
-			{
-				$lesIdProduits = $this->getLesIdProduitsDuPanier();
-				$this->modeleFront->creerCommande($nom,$rue,$cp,$ville,$mail, $lesIdProduits );
-				$message = "La commande a été enregistrée. Merci de votre visite.";
-				$this->supprimerPanier();
-				include ("vues/v_message.php");
-			}
-		}
-	/**
-	 * Supprime le panier
-	 *
-	 * Supprime le tableau $_SESSION['produits']
-	 */
-	function supprimerPanier()
-	{
-    	unset($_SESSION['produits']);
-   		$this->voirPanier();
-	}
-	/**
-	 * teste si une chaîne a un format de code postal
-	 *
-	 * Teste le nombre de caractères de la chaîne et le type entier (composé de chiffres)
-	 
-	* @param string $codePostal  la chaîne testée
-	* @return boolean $ok vrai ou faux
-	*/
-	function estUnCp($codePostal)
-	{
-	return strlen($codePostal)== 5 && $this->estEntier($codePostal);
-	}
-	/**
-	 * teste si une chaîne est un entier
-	 *
-	 * Teste si la chaîne ne contient que des chiffres
-	 
-	* @param string $valeur la chaîne testée
-	* @return boolean $ok vrai ou faux
-	*/
-
-	function estEntier($valeur) 
-	{
-		return preg_match("/[^0-9]/", $valeur) == 0;
-	}
-	/**
-	 * Teste si une chaîne a le format d'un mail
-	 *
-	 * Utilise les expressions régulières
-	 
-	* @param string $mail la chaîne testée
-	* @return boolean $ok vrai ou faux
-	*/
-	function estUnMail($mail)
-	{
-	return  preg_match ('#^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,6}$#', $mail);
-	}
-	/**
-	 * Retourne un tableau d'erreurs de saisie pour une commande
-	 *
-	 * @param string $nom  chaîne testée
-	 * @param  string $rue chaîne
-	 * @param string $ville chaîne
-	 * @param string $cp chaîne
-	 * @param string $mail  chaîne 
-	 * @return array $lesErreurs un tableau de chaînes d'erreurs
-	*/
-	function getErreursSaisieCommande($nom,$rue,$ville,$cp,$mail)
-	{
-		$lesErreurs = array();
-		if($nom=="")
-		{
-			$lesErreurs[]="Il faut saisir le champ nom";
-		}
-		if($rue=="")
-		{
-		$lesErreurs[]="Il faut saisir le champ rue";
-		}
-		if($ville=="")
-		{
-			$lesErreurs[]="Il faut saisir le champ ville";
-		}
-		if($cp=="")
-		{
-			$lesErreurs[]="Il faut saisir le champ code postal";
-		}
-		else
-		{
-			if(!$this->estUnCp($cp))
-			{
-				$lesErreurs[]= "erreur de code postal";
-			}
-		}
-		if($mail=="")
-		{
-			$lesErreurs[]="Il faut saisir le champ mail";
-		}
-		else
-		{
-			if(!$this->estUnMail($mail))
-			{
-				$lesErreurs[]= "erreur de mail";
-			}
-		}
-		return $lesErreurs;
-	}
-}
+?>
