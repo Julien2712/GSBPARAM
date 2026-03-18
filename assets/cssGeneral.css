@@ -59,7 +59,8 @@ flex-flow: row wrap;
 }
 #card{
     width:180px;
-    height : 250px;
+    min-height : 250px;
+    height: auto;
     padding:10px;
     margin : 10px;
     background-color : var(--fondC);
