@@ -1,5 +1,5 @@
 <div id="choixC">
-    <p>Choisir une catégorie :</p>
+    <h2>Choisir une catégorie :</h2>
     <?php
     include('v_categories.php');
     ?>

@@ -45,7 +45,7 @@ header {
 }
 
 #produits {
-	padding: 0 150px;
+	padding: 0 px;
 	display: flex;
 	flex-flow: row wrap;
 }

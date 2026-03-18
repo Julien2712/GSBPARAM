@@ -1,24 +1,32 @@
 <?php
 // dev: afficher les erreurs (en local seulement)
-if (php_sapi_name() !== 'cli') { ini_set('display_errors', 1); error_reporting(E_ALL); }
+if (php_sapi_name() !== 'cli') {
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
+}
 
 require_once __DIR__ . '/../modele/ModeleFront.php';
 
-class ControleurUtilisateur {
+class ControleurUtilisateur
+{
     private $modeleFront;
 
-    public function __construct() {
-        if (session_status() === PHP_SESSION_NONE) session_start();
+    public function __construct()
+    {
+        if (session_status() === PHP_SESSION_NONE)
+            session_start();
         $this->modeleFront = new ModeleFront();
     }
 
-    public function afficherConnexion() {
+    public function afficherConnexion()
+    {
         include __DIR__ . '/../vues/v_connexion.php';
     }
 
-    public function seConnecter() {
+    public function seConnecter()
+    {
         $login = trim($_POST['login'] ?? '');
-        $mdp   = $_POST['mdp'] ?? '';
+        $mdp = $_POST['mdp'] ?? '';
         $msgErreurs = [];
 
         if ($login === '' || $mdp === '') {
@@ -35,11 +43,14 @@ class ControleurUtilisateur {
             // fusion panier DB -> session si méthodes disponibles
             if (method_exists($this->modeleFront, 'getPanierUtilisateur')) {
                 $dbPanier = $this->modeleFront->getPanierUtilisateur($user->id) ?: [];
-                if (!isset($_SESSION['produits']) || !is_array($_SESSION['produits'])) $_SESSION['produits'] = [];
+                if (!isset($_SESSION['produits']) || !is_array($_SESSION['produits']))
+                    $_SESSION['produits'] = [];
                 foreach ($dbPanier as $pid => $q) {
-                    $pid = (string)$pid; $q = max(0, (int)$q);
-                    if ($q <= 0) continue;
-                    $_SESSION['produits'][$pid] = (isset($_SESSION['produits'][$pid]) ? (int)$_SESSION['produits'][$pid] : 0) + $q;
+                    $pid = (string) $pid;
+                    $q = max(0, (int) $q);
+                    if ($q <= 0)
+                        continue;
+                    $_SESSION['produits'][$pid] = (isset($_SESSION['produits'][$pid]) ? (int) $_SESSION['produits'][$pid] : 0) + $q;
                 }
                 if (method_exists($this->modeleFront, 'sauvegarderPanierUtilisateur')) {
                     $this->modeleFront->sauvegarderPanierUtilisateur($user->id, $_SESSION['produits']);
@@ -55,21 +66,30 @@ class ControleurUtilisateur {
         include __DIR__ . '/../vues/v_connexion.php';
     }
 
-    public function afficherInscription() {
+    public function afficherInscription()
+    {
         include __DIR__ . '/../vues/v_inscription.php';
     }
 
-    public function creerCompte() {
+    public function creerCompte()
+    {
         $login = trim($_POST['login'] ?? '');
         $mdp = $_POST['mdp'] ?? '';
         $mdp2 = $_POST['mdp2'] ?? '';
-        $nom  = trim($_POST['nom'] ?? '');
+        $nom = trim($_POST['nom'] ?? '');
+        $prenom = trim($_POST['prenom'] ?? '');
+        $rue = trim($_POST['rue'] ?? '');
+        $cp = trim($_POST['cp'] ?? '');
+        $ville = trim($_POST['ville'] ?? '');
         $mail = trim($_POST['mail'] ?? '');
         $msgErreurs = [];
 
-        if ($login === '' || $mdp === '' || $mdp2 === '') $msgErreurs[] = 'Tous les champs obligatoires.';
-        if ($mdp !== $mdp2) $msgErreurs[] = 'Les mots de passe ne correspondent pas.';
-        if ($this->modeleFront->getUserByLogin($login)) $msgErreurs[] = 'Login déjà utilisé.';
+        if ($login === '' || $mdp === '' || $mdp2 === '')
+            $msgErreurs[] = 'Tous les champs obligatoires.';
+        if ($mdp !== $mdp2)
+            $msgErreurs[] = 'Les mots de passe ne correspondent pas.';
+        if ($this->modeleFront->getUserByLogin($login))
+            $msgErreurs[] = 'Login déjà utilisé.';
 
         if (!empty($msgErreurs)) {
             include __DIR__ . '/../vues/v_inscription.php';
@@ -77,7 +97,7 @@ class ControleurUtilisateur {
         }
 
         $hash = password_hash($mdp, PASSWORD_DEFAULT);
-        $this->modeleFront->creerUtilisateur($login, $hash, $nom, $mail);
+        $this->modeleFront->creerUtilisateur($login, $hash, $nom, $prenom, $rue, $cp, $ville, $mail);
 
         // auto-login après inscription
         $user = $this->modeleFront->getUserByLogin($login);
@@ -94,7 +114,8 @@ class ControleurUtilisateur {
         exit;
     }
 
-    public function deconnecter() {
+    public function deconnecter()
+    {
         if (!empty($_SESSION['utilisateur']->id) && isset($_SESSION['produits']) && is_array($_SESSION['produits'])) {
             if (method_exists($this->modeleFront, 'sauvegarderPanierUtilisateur')) {
                 $this->modeleFront->sauvegarderPanierUtilisateur($_SESSION['utilisateur']->id, $_SESSION['produits']);
