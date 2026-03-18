@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * @file ControleurVoirProduits.php
  * @author Marielle Jouin <jouin.marielle@gmail.com>
@@ -32,7 +32,7 @@ class ControleurVoirProduits{
     $lesCategories = $this->modeleFront->getLesCategories();
     $infosCategorie = $this->modeleFront->getLesInfosCategorie($categ);
 
-    $titreCategorie = "Produits de la catégorie :" . strtolower($infosCategorie->libelle);
+    $titreCategorie = "Produits de la catégorie : " . strtolower($infosCategorie->libelle);
 
     include("vues/v_choixCategorie.php");
     include("vues/v_produits.php");

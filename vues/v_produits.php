@@ -1,6 +1,8 @@
+<?php
+echo "<h2>$titreCategorie</h2>";
+?>
 <div id="produits">
 	<?php
-	echo "<h2>$titreCategorie</h2>";
 
 	foreach ($lesProduits as $unProduit) {
 		$id = $unProduit->id;
@@ -20,7 +22,7 @@
 					<img src="assets/images/mettrepanier.png" title="Ajouter au panier" alt="Mettre au panier"> </a></div>
 
 		</div>
-	<?php
+		<?php
 	}
 	?>
 </div>
