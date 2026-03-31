@@ -98,6 +98,23 @@ class ModeleFront extends Modele
 			die();
 		}
 	}
+
+	/**
+	 * Retourne les produits qui n'ont actuellement aucune catégorie
+	 *
+	 * @return array un tableau des produits sans catégorie
+	 */
+	public function getLesProduitsSansCategorie()
+	{
+		try {
+			$req = "select id, description, prix, image, idCategorie from produit where idCategorie IS NULL OR idCategorie = ''";
+			$res = $this->executerRequete($req);
+			return $res->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
 	/**
 	 * Crée une commande 
 	 *
@@ -223,9 +240,88 @@ class ModeleFront extends Modele
 			$stmt->bindParam(':id', $idUser, PDO::PARAM_INT);
 			return $stmt->execute();
 		} catch (PDOException $e) {
-			// gérer/logguer l'erreur correctement en prod
 			return false;
 		}
 	}
+
+	public function creerCategorie($libelle)
+	{
+		try {
+			$req = 'INSERT INTO categorie (libelle) VALUES (:libelle)';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->bindParam(':libelle', $libelle, PDO::PARAM_STR);
+			$stmt->execute();
+			return true;
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function modifierCategorie($ancienIdCategorie, $nouvelIdCategorie, $libelle)
+	{
+		try {
+			$this->getBdd()->exec('SET FOREIGN_KEY_CHECKS=0;');
+
+			$req = 'UPDATE categorie SET id = :nouvelId, libelle = :libelle WHERE id = :ancienId';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->bindParam(':nouvelId', $nouvelIdCategorie, PDO::PARAM_STR);
+			$stmt->bindParam(':libelle', $libelle, PDO::PARAM_STR);
+			$stmt->bindParam(':ancienId', $ancienIdCategorie, PDO::PARAM_STR);
+			$stmt->execute();
+
+			if ($ancienIdCategorie !== $nouvelIdCategorie) {
+				$reqProd = 'UPDATE produit SET idCategorie = :nouvelId WHERE idCategorie = :ancienId';
+				$stmtProd = $this->getBdd()->prepare($reqProd);
+				$stmtProd->bindParam(':nouvelId', $nouvelIdCategorie, PDO::PARAM_STR);
+				$stmtProd->bindParam(':ancienId', $ancienIdCategorie, PDO::PARAM_STR);
+				$stmtProd->execute();
+			}
+
+			$this->getBdd()->exec('SET FOREIGN_KEY_CHECKS=1;');
+			return true;
+		} catch (PDOException $e) {
+			$this->getBdd()->exec('SET FOREIGN_KEY_CHECKS=1;');
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function supprimerCategorie($idCategorie)
+	{
+		try {
+			$reqCheck = 'SELECT count(*) as nb FROM produit WHERE idCategorie = :id';
+			$stmtCheck = $this->getBdd()->prepare($reqCheck);
+			$stmtCheck->bindParam(':id', $idCategorie, PDO::PARAM_STR);
+			$stmtCheck->execute();
+			$resultat = $stmtCheck->fetch();
+
+			if ($resultat['nb'] > 0) {
+				return false;
+			}
+
+			$req = 'DELETE FROM categorie WHERE id = :id';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->bindParam(':id', $idCategorie, PDO::PARAM_STR);
+			$stmt->execute();
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+	public function changerCategorieProduit($idProduit, $nouvelleCategorie)
+	{
+		try {
+			$req = 'UPDATE produit SET idCategorie = :idCategorie WHERE id = :id';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->bindParam(':idCategorie', $nouvelleCategorie, PDO::PARAM_STR);
+			$stmt->bindParam(':id', $idProduit, PDO::PARAM_STR);
+			$stmt->execute();
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
 }
 ?>

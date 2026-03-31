@@ -128,12 +128,15 @@ div.photoCard>img {
 #message,
 #erreurs {
 	margin: 2px;
+	margin-right: 20px;
 }
 
-#panier {
+#panier,
+#categorie {
 	font-size: large;
 	margin: 2px;
 }
+
 
 button {
 	margin: 3px 0px;
