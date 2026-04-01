@@ -64,11 +64,11 @@ header {
 #produits a {
 	list-style-type: none;
 	list-style-image: none;
-	display: inline;
-	width: 175px;
+	display: inline-block;
 	text-align: center;
-	height: 205px;
 	font: 1em "Trebuchet MS", Arial, sans-serif;
+	text-decoration: none;
+	color: inherit;
 }
 
 #card {
@@ -100,10 +100,11 @@ header {
 	max-height: 140px;
 }
 
-div.photoCard>img {
-	max-width: 200px;
+div.photoCard img {
+	max-width: 160px;
 	max-height: 140px;
-
+	height: 140px;
+	object-fit: contain;
 }
 
 .contenuCentre {
@@ -148,4 +149,236 @@ button {
 
 #erreurs {
 	margin-right: 20px;
+}
+
+/* --- Styles pour les fiches produits et détails (USR 5) --- */
+.card-actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px;
+	margin-top: auto;
+}
+
+.btn-info-produit {
+	background-color: #28a745;
+	color: white !important;
+	padding: 5px 10px;
+	text-decoration: none;
+	border-radius: 5px;
+	font-size: 14px;
+	transition: background-color 0.2s;
+}
+
+.btn-info-produit:hover {
+	background-color: #218838;
+}
+
+.produit-details-container {
+	display: flex;
+	flex-wrap: wrap;
+	padding: 20px;
+	justify-content: center;
+	font-family: sans-serif;
+	max-width: 900px;
+	margin: 0 auto;
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.produit-details-image {
+	flex: 1;
+	min-width: 300px;
+	text-align: center;
+}
+
+.produit-details-image img {
+	max-width: 100%;
+	max-height: 400px;
+	object-fit: contain;
+}
+
+.produit-details-infos {
+	flex: 1;
+	min-width: 300px;
+	padding: 20px;
+}
+
+.produit-details-titre {
+	color: #28a745;
+	margin-top: 0;
+}
+
+.produit-details-marque {
+	font-size: 14px;
+	color: #555;
+}
+
+.produit-details-description {
+	margin-top: 20px;
+}
+
+.produit-details-description u {
+	font-size: 14px;
+	color: #555;
+}
+
+.produit-details-description p {
+	font-size: 14px;
+	color: #666;
+	line-height: 1.5;
+}
+
+.produit-details-avis {
+	margin: 20px 0;
+	color: #ffc107;
+	font-size: 18px;
+}
+
+.produit-details-avis span a {
+	color: #28a745;
+	text-decoration: underline;
+	margin-left: 10px;
+	font-size: 14px;
+}
+
+.produit-details-prix {
+	margin-top: 20px;
+}
+
+.prix-valeur {
+	color: #28a745;
+	font-weight: bold;
+	font-size: 24px;
+}
+
+.stock-status {
+	font-size: 14px;
+	margin-left: 10px;
+}
+
+.stock-rupture {
+	color: red;
+}
+
+.stock-ok {
+	color: #28a745;
+}
+
+.contenance-info {
+	margin-bottom: 20px;
+	font-size: 14px;
+	color: #555;
+}
+
+.contenance-info span {
+	font-weight: bold;
+}
+
+.produit-ajouter-panier {
+	margin-top: 20px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.produit-ajouter-panier select {
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.produit-ajouter-panier button {
+	background-color: #28a745;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: background-color 0.2s;
+}
+
+.produit-ajouter-panier button:hover {
+	background-color: #218838;
+}
+
+.produit-retour {
+	margin-top: 30px;
+	text-align: center;
+}
+
+.produit-retour a {
+	display: inline-block;
+	border: 1px solid #28a745;
+	color: #28a745 !important;
+	padding: 8px 30px;
+	text-decoration: none;
+	border-radius: 5px;
+	text-transform: uppercase;
+	font-size: 14px;
+	font-weight: bold;
+	transition: all 0.2s;
+}
+
+.produit-retour a:hover {
+	background-color: #28a745;
+	color: white !important;
+}
+
+.produits-associes-container {
+	margin-top: 50px;
+	text-align: center;
+}
+
+.produits-associes-titre {
+	color: #888;
+	text-transform: uppercase;
+	font-size: 16px;
+	letter-spacing: 1px;
+}
+
+.produits-associes-liste {
+	display: flex;
+	justify-content: center;
+	gap: 20px;
+	flex-wrap: wrap;
+	margin-top: 20px;
+}
+
+.produit-associe-card {
+	width: 150px;
+	background: white;
+	border: 1px solid #eee;
+	padding: 15px;
+	border-radius: 8px;
+	text-align: center;
+	transition: transform 0.2s;
+}
+
+.produit-associe-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.produit-associe-card img {
+	max-height: 100px;
+	max-width: 100px;
+	object-fit: contain;
+	margin-bottom: 10px;
+}
+
+.produit-associe-card p.desc {
+	margin: 0;
+	font-size: 12px;
+	height: 3em;
+	overflow: hidden;
+}
+
+.produit-associe-card p.prix {
+	font-weight: bold;
+	margin: 10px 0 0 0;
+	font-size: 14px;
+	color: #333;
 }
