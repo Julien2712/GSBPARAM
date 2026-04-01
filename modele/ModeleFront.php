@@ -32,6 +32,23 @@ class ModeleFront extends Modele
 		}
 	}
 	/**
+	 * Retourne toutes les marques 
+	 *
+	 * @return array $lesLignes le tableau des marques (tableau d'objets)
+	 */
+	public function getLesMarques()
+	{
+		try {
+			$req = 'select marqueID as id, marqueLibelle as libelle from marque';
+			$res = $this->executerRequete($req);
+			$lesLignes = $res->fetchAll(PDO::FETCH_OBJ);
+			return $lesLignes;
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+	/**
 	 * Retourne toutes les informations d'une catégorie passée en paramètre
 	 *
 	 * @param string $idCategorie l'id de la catégorie
@@ -88,7 +105,7 @@ class ModeleFront extends Modele
 				}
 			} else // on souhaite tous les produits
 			{
-				$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie from produit;';
+				$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, prodStock as stock, marqueID from produit;';
 				$res = $this->executerRequete($req);
 				$lesProduits = $res->fetchAll(PDO::FETCH_OBJ);
 			}
@@ -487,6 +504,77 @@ class ModeleFront extends Modele
 			return true;
 		} catch (PDOException $e) {
 			return false;
+		}
+	}
+
+	public function getLesInfosProduit($idProduit)
+	{
+		try {
+			$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, prodStock as stock, marqueID from produit where prodId ="' . $idProduit . '"';
+			$res = $this->executerRequete($req);
+			$laLigne = $res->fetch(PDO::FETCH_OBJ);
+			return $laLigne;
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function creerProduit($id, $description, $prix, $image, $idCategorie = null, $stock = 0, $marqueID = 1)
+	{
+		try {
+			$date = date('Y-m-d');
+			$req = "INSERT INTO produit (prodId, prodDescription, prodPrix, prodImage, prodDateAjout, idCategorie, marqueID, prodStock) 
+					VALUES (:id, :descr, :prix, :img, :date, :categ, :marque, :stock)";
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([
+				':id' => $id,
+				':descr' => $description,
+				':prix' => $prix,
+				':img' => $image,
+				':date' => $date,
+				':categ' => $idCategorie,
+				':marque' => $marqueID,
+				':stock' => $stock
+			]);
+			return true;
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function modifierProduit($idProduit, $description, $prix, $image, $idCategorie = null, $stock = 0, $marqueID = 1)
+	{
+		try {
+			$req = "UPDATE produit SET prodDescription = :descr, prodPrix = :prix, prodImage = :img, idCategorie = :categ, prodStock = :stock, marqueID = :marque WHERE prodId = :id";
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([
+				':id' => $idProduit,
+				':descr' => $description,
+				':prix' => $prix,
+				':img' => $image,
+				':categ' => $idCategorie,
+				':stock' => $stock,
+				':marque' => $marqueID
+			]);
+			return true;
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function supprimerProduit($idProduit)
+	{
+		try {
+			$req = "DELETE FROM produit WHERE prodId = :id";
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':id' => $idProduit]);
+			return true;
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
 		}
 	}
 
