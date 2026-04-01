@@ -10,23 +10,35 @@
         class="border p-4 rounded shadow-sm bg-light">
         <div class="row">
             <div class="mb-3">
-                <label for="id" class="form-label">Identifiant du produit (obligatoire, ex: p11) :</label>
+                <label for="id" class="form-label">Identifiant du produit (obligatoire) :</label>
                 <input type="text" class="form-control" name="id" id="id" required maxlength="5"
                     placeholder="p<?= $prochainID ?>">
             </div>
 
             <div class="mb-3">
                 <label for="description" class="form-label">Nom du produit :</label>
-                <input type="text" class="form-control" name="description" id="description" required>
+                <input type="text" class="form-control" name="description" id="description" required
+                    placeholder="Champoing">
             </div>
         </div>
 
         <div class="mb-3">
             <label for="image" class="form-label">Image du produit :</label>
             <div class="input-group">
-                <input type="text" class="form-control" name="image" id="image" placeholder="assets/images/...">
+                <input type="file" class="form-control" id="file_picker" accept="image/*">
+                <input type="text" class="form-control" name="image" id="image" placeholder="assets/images/..."
+                    required>
             </div>
+            <div class="form-text">Sélectionnez un fichier pour pré-remplir le chemin.</div>
         </div>
+
+        <script>
+            document.getElementById('file_picker').addEventListener('change', function (e) {
+                if (e.target.files.length > 0) {
+                    document.getElementById('image').value = 'assets/images/' + e.target.files[0].name;
+                }
+            });
+        </script>
 
         <div class="mb-3">
             <label for="marqueID" class="form-label">Marque du produit :</label>
@@ -43,11 +55,11 @@
             <label for="idCategorie" class="form-label">Catégorie du produit :</label>
             <select name="idCategorie" id="idCategorie" class="form-select">
                 <option value="" selected>- Choisissez une catégorie -</option>
-                        <?php foreach ($lesCategories as $uneCategorie): ?>
+                <?php foreach ($lesCategories as $uneCategorie): ?>
                     <option value="<?= $uneCategorie->id ?>">
-                                <?= htmlspecialchars($uneCategorie->libelle ?? '', ENT_QUOTES, 'UTF-8') ?>
+                        <?= htmlspecialchars($uneCategorie->libelle ?? '', ENT_QUOTES, 'UTF-8') ?>
                     </option>
-                        <?php endforeach; ?>
+                <?php endforeach; ?>
             </select>
         </div>
 
@@ -65,7 +77,7 @@
 
         <div class="row mt-4">
             <div class="col-12 text-center">
-                <button type="submit" class="btn btn-success px-5 py-2">Ajouter le produit</button>
+                <button type="submit" class="btn btn-primary shadow-sm">Ajouter le produit</button>
             </div>
         </div>
 
