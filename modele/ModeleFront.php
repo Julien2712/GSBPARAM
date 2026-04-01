@@ -60,7 +60,7 @@ class ModeleFront extends Modele
 	public function getLesProduitsDeCategorie($idCategorie)
 	{
 		try {
-			$req = 'select id, description, prix, image, idCategorie from produit where idCategorie ="' . $idCategorie . '"';
+			$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie from produit where idCategorie ="' . $idCategorie . '"';
 			$res = $this->executerRequete($req);
 			$lesLignes = $res->fetchAll(PDO::FETCH_OBJ);
 			return $lesLignes;
@@ -81,14 +81,14 @@ class ModeleFront extends Modele
 			$lesProduits = array();
 			if ($desIdsProduit != null) {
 				foreach ($desIdsProduit as $unIdProduit) {
-					$req = 'select id, description, prix, image, idCategorie from produit where id = "' . $unIdProduit . '"';
+					$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie from produit where prodId = "' . $unIdProduit . '"';
 					$res = $this->executerRequete($req);
 					$unProduit = $res->fetch(PDO::FETCH_OBJ);
 					$lesProduits[] = $unProduit;
 				}
 			} else // on souhaite tous les produits
 			{
-				$req = 'select id, description, prix, image, idCategorie from produit;';
+				$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie from produit;';
 				$res = $this->executerRequete($req);
 				$lesProduits = $res->fetchAll(PDO::FETCH_OBJ);
 			}
@@ -107,7 +107,7 @@ class ModeleFront extends Modele
 	public function getLesProduitsSansCategorie()
 	{
 		try {
-			$req = "select id, description, prix, image, idCategorie from produit where idCategorie IS NULL OR idCategorie = ''";
+			$req = "select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie from produit where idCategorie IS NULL OR idCategorie = ''";
 			$res = $this->executerRequete($req);
 			return $res->fetchAll(PDO::FETCH_OBJ);
 		} catch (PDOException $e) {
@@ -132,22 +132,54 @@ class ModeleFront extends Modele
 	public function creerCommande($nom, $rue, $cp, $ville, $mail, $lesIdProduit)
 	{
 		try {
-			// on récupère le dernier id de commande
-			$req = 'select max(id) as maxi from commande';
-			$res = $this->executerRequete($req);
-			$laLigne = $res->fetch();
-			$maxi = $laLigne['maxi'];// on place le dernier id de commande dans $maxi
-			$idCommande = $maxi + 1; // on augmente le dernier id de commande de 1 pour avoir le nouvel idCommande
-			$date = date('Y/m/d'); // récupération de la date système
-			$req = "insert into commande values ('$idCommande','$date','$nom','$rue','$cp','$ville','$mail')";
-			$res = $this->executerRequete($req);
-			// insertion produits commandés (on dédoublonne pour éviter l'erreur de clé primaire)
-			$lesIdProduitUniques = array_unique($lesIdProduit);
-			foreach ($lesIdProduitUniques as $unIdProduit) {
-				$req = "insert into contenir values ('$idCommande','$unIdProduit')";
-				$res = $this->executerRequete($req);
+			$this->getBdd()->beginTransaction();
+
+			// 1. Get next panierID
+			$reqId = 'SELECT IFNULL(MAX(panierID), 0) + 1 as nextId FROM panier_commande';
+			$resId = $this->getBdd()->query($reqId);
+			$panierID = $resId->fetch()['nextId'];
+
+			$date = date('Y-m-d');
+			$utiId = null;
+			if (isset($_SESSION['utilisateur']->id)) {
+				$utiId = $_SESSION['utilisateur']->id;
 			}
+
+			// 2. Insert into panier_commande
+			$reqPC = "INSERT INTO panier_commande (panierID, panierDate, dateCommande, etatCommande, utiId) 
+					  VALUES (:id, :pdate, :cdate, 'validée', :utiId)";
+			$stmtPC = $this->getBdd()->prepare($reqPC);
+			$stmtPC->execute([
+				':id' => $panierID,
+				':pdate' => $date,
+				':cdate' => $date,
+				':utiId' => $utiId
+			]);
+
+			// 3. Insert into lignecommande (with deduplication and quantity count)
+			$counts = array_count_values($lesIdProduit);
+			
+			$reqL = "INSERT INTO lignecommande (ligneID, ligneQuantite, prodId, panierID) 
+					 VALUES (:lid, :qte, :pid, :panId)";
+			$stmtL = $this->getBdd()->prepare($reqL);
+
+			foreach ($counts as $pid => $qte) {
+				// Get next ligneID
+				$reqIdL = 'SELECT IFNULL(MAX(ligneID), 0) + 1 as nextId FROM lignecommande';
+				$resIdL = $this->getBdd()->query($reqIdL);
+				$ligneID = $resIdL->fetch()['nextId'];
+
+				$stmtL->execute([
+					':lid' => $ligneID,
+					':qte' => $qte,
+					':pid' => $pid,
+					':panId' => $panierID
+				]);
+			}
+
+			$this->getBdd()->commit();
 		} catch (PDOException $e) {
+			$this->getBdd()->rollBack();
 			print "Erreur !: " . $e->getMessage();
 			die();
 		}
@@ -158,7 +190,7 @@ class ModeleFront extends Modele
 	public function getUserByLogin($login)
 	{
 		try {
-			$req = 'SELECT id, login, motdepasse, nom, mail FROM utilisateur WHERE login = :login';
+			$req = 'SELECT utiId as id, utiLogin as login, conMdp as motdepasse, utiNom as nom, utiMail as mail FROM utilisateur JOIN connexion ON utilisateur.conId = connexion.conId WHERE utiLogin = :login';
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->bindParam(':login', $login, PDO::PARAM_STR);
 			$stmt->execute();
@@ -175,19 +207,44 @@ class ModeleFront extends Modele
 	public function creerUtilisateur($login, $hashMdp, $nom, $prenom, $rue, $cp, $ville, $mail)
 	{
 		try {
-			$req = 'INSERT INTO utilisateur (login, motdepasse, nom, prenom, rue, cp, ville, mail) VALUES (:login, :mdp, :nom, :prenom, :rue, :cp, :ville, :mail)';
-			$stmt = $this->getBdd()->prepare($req);
-			$stmt->bindParam(':login', $login, PDO::PARAM_STR);
-			$stmt->bindParam(':mdp', $hashMdp, PDO::PARAM_STR);
-			$stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
-			$stmt->bindParam(':prenom', $prenom, PDO::PARAM_STR);
-			$stmt->bindParam(':rue', $rue, PDO::PARAM_STR);
-			$stmt->bindParam(':cp', $cp, PDO::PARAM_STR);
-			$stmt->bindParam(':ville', $ville, PDO::PARAM_STR);
-			$stmt->bindParam(':mail', $mail, PDO::PARAM_STR);
-			$stmt->execute();
+			$this->getBdd()->beginTransaction();
+
+			// 1. Get next conId
+			$reqIdCon = 'SELECT IFNULL(MAX(conId), 0) + 1 as nextId FROM connexion';
+			$resIdCon = $this->getBdd()->query($reqIdCon);
+			$conId = $resIdCon->fetch()['nextId'];
+
+			// 2. Insert into connexion
+			$reqCon = 'INSERT INTO connexion (conId, conMdp) VALUES (:conId, :mdp)';
+			$stmtCon = $this->getBdd()->prepare($reqCon);
+			$stmtCon->bindParam(':conId', $conId, PDO::PARAM_INT);
+			$stmtCon->bindParam(':mdp', $hashMdp, PDO::PARAM_STR);
+			$stmtCon->execute();
+
+			// 3. Get next utiId
+			$reqIdUti = 'SELECT IFNULL(MAX(utiId), 0) + 1 as nextId FROM utilisateur';
+			$resIdUti = $this->getBdd()->query($reqIdUti);
+			$utiId = $resIdUti->fetch()['nextId'];
+
+			// 4. Insert into utilisateur (habId = 1 for Client)
+			$completNom = $nom . ' ' . $prenom;
+			$reqUti = 'INSERT INTO utilisateur (utiId, utiLogin, utiNom, utiMail, utiCp, utiVille, utiAdresse, habId, conId) 
+					   VALUES (:utiId, :login, :nom, :mail, :cp, :ville, :adresse, 1, :conId)';
+			$stmtUti = $this->getBdd()->prepare($reqUti);
+			$stmtUti->bindParam(':utiId', $utiId, PDO::PARAM_INT);
+			$stmtUti->bindParam(':login', $login, PDO::PARAM_STR);
+			$stmtUti->bindParam(':nom', $completNom, PDO::PARAM_STR);
+			$stmtUti->bindParam(':mail', $mail, PDO::PARAM_STR);
+			$stmtUti->bindParam(':cp', $cp, PDO::PARAM_STR);
+			$stmtUti->bindParam(':ville', $ville, PDO::PARAM_STR);
+			$stmtUti->bindParam(':adresse', $rue, PDO::PARAM_STR);
+			$stmtUti->bindParam(':conId', $conId, PDO::PARAM_INT);
+			$stmtUti->execute();
+
+			$this->getBdd()->commit();
 			return true;
 		} catch (PDOException $e) {
+			$this->getBdd()->rollBack();
 			print "Erreur !: " . $e->getMessage();
 			die();
 		}
@@ -212,17 +269,20 @@ class ModeleFront extends Modele
 	public function getPanierUtilisateur($idUser)
 	{
 		try {
-			$req = 'SELECT panier FROM utilisateur WHERE id = :id';
+			$req = "SELECT prodId, ligneQuantite 
+					FROM panier_commande 
+					JOIN lignecommande ON panier_commande.panierID = lignecommande.panierID 
+					WHERE utiId = :id AND etatCommande = 'en_cours'";
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->bindParam(':id', $idUser, PDO::PARAM_INT);
 			$stmt->execute();
-			$row = $stmt->fetch(PDO::FETCH_ASSOC);
-			if (!$row || empty($row['panier']))
-				return [];
-			$data = json_decode($row['panier'], true);
-			return is_array($data) ? $data : [];
+			
+			$panier = [];
+			while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+				$panier[$row['prodId']] = $row['ligneQuantite'];
+			}
+			return $panier;
 		} catch (PDOException $e) {
-			// gérer/logguer l'erreur correctement en prod
 			return [];
 		}
 	}
@@ -233,13 +293,56 @@ class ModeleFront extends Modele
 	public function sauvegarderPanierUtilisateur($idUser, array $panierAssoc)
 	{
 		try {
-			$json = json_encode($panierAssoc);
-			$req = 'UPDATE utilisateur SET panier = :panier WHERE id = :id';
+			$this->getBdd()->beginTransaction();
+
+			// 1. Find or create 'en_cours' panier
+			$req = "SELECT panierID FROM panier_commande WHERE utiId = :id AND etatCommande = 'en_cours'";
 			$stmt = $this->getBdd()->prepare($req);
-			$stmt->bindParam(':panier', $json, PDO::PARAM_STR);
-			$stmt->bindParam(':id', $idUser, PDO::PARAM_INT);
-			return $stmt->execute();
+			$stmt->execute([':id' => $idUser]);
+			$panier = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			if ($panier) {
+				$panierID = $panier['panierID'];
+				// Delete old lines
+				$reqDel = "DELETE FROM lignecommande WHERE panierID = :id";
+				$stmtDel = $this->getBdd()->prepare($reqDel);
+				$stmtDel->execute([':id' => $panierID]);
+			} else {
+				// Create new panier
+				$reqId = 'SELECT IFNULL(MAX(panierID), 0) + 1 as nextId FROM panier_commande';
+				$resId = $this->getBdd()->query($reqId);
+				$panierID = $resId->fetch()['nextId'];
+
+				$date = date('Y-m-d');
+				$reqIns = "INSERT INTO panier_commande (panierID, panierDate, dateCommande, etatCommande, utiId) 
+						   VALUES (:id, :date, :date, 'en_cours', :utiId)";
+				$stmtIns = $this->getBdd()->prepare($reqIns);
+				$stmtIns->execute([':id' => $panierID, ':date' => $date, ':utiId' => $idUser]);
+			}
+
+			// 2. Insert new lines
+			$reqL = "INSERT INTO lignecommande (ligneID, ligneQuantite, prodId, panierID) VALUES (:lid, :qte, :pid, :panId)";
+			$stmtL = $this->getBdd()->prepare($reqL);
+
+			foreach ($panierAssoc as $pid => $qte) {
+				if ($qte <= 0) continue;
+				// Get next ligneID
+				$reqIdL = 'SELECT IFNULL(MAX(ligneID), 0) + 1 as nextId FROM lignecommande';
+				$resIdL = $this->getBdd()->query($reqIdL);
+				$ligneID = $resIdL->fetch()['nextId'];
+
+				$stmtL->execute([
+					':lid' => $ligneID,
+					':qte' => $qte,
+					':pid' => $pid,
+					':panId' => $panierID
+				]);
+			}
+
+			$this->getBdd()->commit();
+			return true;
 		} catch (PDOException $e) {
+			$this->getBdd()->rollBack();
 			return false;
 		}
 	}
@@ -312,7 +415,7 @@ class ModeleFront extends Modele
 	public function changerCategorieProduit($idProduit, $nouvelleCategorie)
 	{
 		try {
-			$req = 'UPDATE produit SET idCategorie = :idCategorie WHERE id = :id';
+			$req = 'UPDATE produit SET idCategorie = :idCategorie WHERE prodId = :id';
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->bindParam(':idCategorie', $nouvelleCategorie, PDO::PARAM_STR);
 			$stmt->bindParam(':id', $idProduit, PDO::PARAM_STR);
