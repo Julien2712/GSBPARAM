@@ -1,5 +1,8 @@
 <?php
 echo "<h2>$titreCategorie</h2>";
+if (isset($erreurFiltre)) {
+    echo "<div style='color: white; background-color: #dc3545; padding: 10px; border-radius: 5px; margin-bottom: 20px;'>$erreurFiltre</div>";
+}
 ?>
 <div id="produits">
 	<?php

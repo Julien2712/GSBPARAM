@@ -100,6 +100,70 @@ class ModeleFront extends Modele
 	}
 
 	/**
+	 * Retourne les produits qui correspondent aux filtres
+	 *
+	 * @param string $idCategorie id de la catégorie
+	 * @param float $prixMin prix minimum
+	 * @param float $prixMax prix maximum
+	 * @param int $marqueId id de la marque
+	 * @return array un tableau des produits filtrés
+	 */
+	public function getLesProduitsFiltres($idCategorie = null, $prixMin = null, $prixMax = null, $marqueId = null)
+	{
+		try {
+			$req = "SELECT prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, marqueID FROM produit WHERE 1=1";
+			$params = [];
+			
+			if (!empty($idCategorie)) {
+				$req .= " AND idCategorie = :idCategorie";
+				$params[':idCategorie'] = $idCategorie;
+			}
+			if ($prixMin !== null && $prixMin !== '') {
+				$req .= " AND prodPrix >= :prixMin";
+				$params[':prixMin'] = $prixMin;
+			}
+			if ($prixMax !== null && $prixMax !== '') {
+				$req .= " AND prodPrix <= :prixMax";
+				$params[':prixMax'] = $prixMax;
+			}
+			if (!empty($marqueId)) {
+				$req .= " AND marqueID = :marqueId";
+				$params[':marqueId'] = $marqueId;
+			}
+			
+			if ($prixMin !== null && $prixMin !== '' && $prixMax !== null && $prixMax !== '') {
+				if ((float)$prixMin > (float)$prixMax) {
+					throw new Exception("Erreur : le prix minimum est supérieur au prix maximum");
+				}
+			}
+			
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute($params);
+			return $stmt->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	/**
+	 * Retourne toutes les marques
+	 *
+	 * @return array un tableau des marques
+	 */
+	public function getLesMarques()
+	{
+		try {
+			$req = 'SELECT marqueID as id, marqueLibelle as libelle FROM marque';
+			$res = $this->executerRequete($req);
+			return $res->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	/**
 	 * Retourne les produits qui n'ont actuellement aucune catégorie
 	 *
 	 * @return array un tableau des produits sans catégorie

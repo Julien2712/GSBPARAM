@@ -60,6 +60,10 @@ class Routeur
                         $this->ctrlVoirProduits->voirTousLesProduits();
                         break;
                     }
+                    case 'filtrer': {
+                        $this->ctrlVoirProduits->filtrer();
+                        break;
+                    }
                 }
                 ;
                 break;
