@@ -32,23 +32,6 @@ class ModeleFront extends Modele
 		}
 	}
 	/**
-	 * Retourne toutes les marques 
-	 *
-	 * @return array $lesLignes le tableau des marques (tableau d'objets)
-	 */
-	public function getLesMarques()
-	{
-		try {
-			$req = 'select marqueID as id, marqueLibelle as libelle from marque';
-			$res = $this->executerRequete($req);
-			$lesLignes = $res->fetchAll(PDO::FETCH_OBJ);
-			return $lesLignes;
-		} catch (PDOException $e) {
-			print "Erreur !: " . $e->getMessage();
-			die();
-		}
-	}
-	/**
 	 * Retourne toutes les informations d'une catégorie passée en paramètre
 	 *
 	 * @param string $idCategorie l'id de la catégorie
