@@ -53,8 +53,8 @@
 
         <div class="mb-3">
             <label for="idCategorie" class="form-label">Catégorie du produit :</label>
-            <select name="idCategorie" id="idCategorie" class="form-select">
-                <option value="" selected>- Choisissez une catégorie -</option>
+            <select name="idCategorie" id="idCategorie" class="form-select" required>
+                <option value="" disabled selected hidden>- Choisissez une catégorie -</option>
                 <?php foreach ($lesCategories as $uneCategorie): ?>
                     <option value="<?= $uneCategorie->id ?>">
                         <?= htmlspecialchars($uneCategorie->libelle ?? '', ENT_QUOTES, 'UTF-8') ?>

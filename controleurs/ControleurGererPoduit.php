@@ -41,7 +41,7 @@ class ControleurGererProduit
                 $description = isset($_POST['description']) ? trim($_POST['description']) : '';
                 $prix = isset($_POST['prix']) ? trim($_POST['prix']) : 0;
                 $image = isset($_POST['image']) ? trim($_POST['image']) : '';
-                $idCategorie = isset($_POST['idCategorie']) ? $_POST['idCategorie'] : null;
+                $idCategorie = !empty($_POST['idCategorie']) ? $_POST['idCategorie'] : null;
                 $stock = isset($_POST['stock']) ? intval($_POST['stock']) : 0;
                 $marqueID = isset($_POST['marqueID']) ? intval($_POST['marqueID']) : 1;
                 
@@ -56,7 +56,7 @@ class ControleurGererProduit
                     $description = isset($_POST['description']) ? trim($_POST['description']) : '';
                     $prix = isset($_POST['prix']) ? trim($_POST['prix']) : 0;
                     $image = isset($_POST['image']) ? trim($_POST['image']) : '';
-                    $idCategorie = isset($_POST['idCategorie']) ? $_POST['idCategorie'] : null;
+                    $idCategorie = !empty($_POST['idCategorie']) ? $_POST['idCategorie'] : null;
                     $stock = isset($_POST['stock']) ? intval($_POST['stock']) : 0;
                     $marqueID = isset($_POST['marqueID']) ? intval($_POST['marqueID']) : 1;
 
