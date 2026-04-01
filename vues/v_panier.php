@@ -7,9 +7,9 @@ if(!isset($lesQuantites)) $lesQuantites = [];
 foreach( $lesProduitsDuPanier as $unProduit)
 {
     $id = (string)$unProduit->id;
-    $description = htmlspecialchars($unProduit->description, ENT_QUOTES, 'UTF-8');
-    $image = htmlspecialchars($unProduit->image, ENT_QUOTES, 'UTF-8');
-    $prix = htmlspecialchars($unProduit->prix, ENT_QUOTES, 'UTF-8');
+    $description = htmlspecialchars($unProduit->description ?? '', ENT_QUOTES, 'UTF-8');
+    $image = htmlspecialchars($unProduit->image ?? '', ENT_QUOTES, 'UTF-8');
+    $prix = htmlspecialchars($unProduit->prix ?? '', ENT_QUOTES, 'UTF-8');
     $quantite = isset($lesQuantites[$id]) ? (int)$lesQuantites[$id] : 1;
 ?>
     <div id="card">

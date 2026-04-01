@@ -23,9 +23,12 @@ $user = $_SESSION['utilisateur'] ?? null;
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Produits par catégorie</a></li>
             <li><a href="index.php?uc=gererPanier&action=voirPanier"
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Mon panier</a></li>
+
+            <!-- Parties Admin (à faire)-->
             <li><a href="index.php?uc=gererCategorie&action=afficher"
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer les catégories</a></li>
-
+            <li><a href="index.php?uc=gererProduit&action=afficher"
+                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer les produits</a></li>
             <!-- Connexion / Inscription (ou Déconnexion si connecté) -->
             <?php if ($user): ?>
             <li><span class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Bonjour

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : mer. 01 avr. 2026 à 11:40
+-- Généré le : mer. 01 avr. 2026 à 12:58
 -- Version du serveur : 11.5.2-MariaDB
 -- Version de PHP : 8.3.14
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `gsbparam`
+-- Base de données : `test`
 --
 
 -- --------------------------------------------------------
@@ -125,14 +125,14 @@ INSERT INTO `habilitation` (`habId`, `habLibelle`) VALUES
 
 DROP TABLE IF EXISTS `lignecommande`;
 CREATE TABLE IF NOT EXISTS `lignecommande` (
-  `ligneID` int(11) NOT NULL,
+  `ligneID` int(11) NOT NULL AUTO_INCREMENT,
   `ligneQuantite` int(11) NOT NULL,
   `prodId` varchar(5) NOT NULL,
-  `panierID` int(11) NOT NULL,
+  `panierID` bigint(20) NOT NULL,
   PRIMARY KEY (`ligneID`),
   KEY `lignecommande_prodId_FK` (`prodId`),
   KEY `lignecommande_panierID_FK` (`panierID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
 -- Déchargement des données de la table `lignecommande`
@@ -183,7 +183,7 @@ INSERT INTO `marque` (`marqueID`, `marqueLibelle`) VALUES
 
 DROP TABLE IF EXISTS `panier_commande`;
 CREATE TABLE IF NOT EXISTS `panier_commande` (
-  `panierID` int(11) NOT NULL,
+  `panierID` bigint(20) NOT NULL,
   `panierDate` date NOT NULL,
   `dateCommande` date NOT NULL,
   `etatCommande` varchar(255) NOT NULL,
@@ -207,8 +207,7 @@ INSERT INTO `panier_commande` (`panierID`, `panierDate`, `dateCommande`, `etatCo
 (1101461671, '2025-10-09', '2025-10-09', 'validée', NULL),
 (1101461672, '2025-10-09', '2025-10-09', 'validée', NULL),
 (1101461673, '2025-10-09', '2025-10-09', 'validée', NULL),
-(1101461674, '2025-10-09', '2025-10-09', 'validée', NULL),
-(1101461675, '2026-04-01', '2026-04-01', 'en_cours', 1);
+(1101461674, '2025-10-09', '2025-10-09', 'validée', NULL);
 
 -- --------------------------------------------------------
 
@@ -222,11 +221,11 @@ CREATE TABLE IF NOT EXISTS `produit` (
   `prodDescription` char(50) DEFAULT NULL,
   `prodPrix` decimal(10,2) DEFAULT NULL,
   `prodImage` char(100) DEFAULT NULL,
-  `prodDateAjout` date NOT NULL,
+  `prodDateAjout` date DEFAULT NULL,
   `prodStock` int(11) NOT NULL DEFAULT 0,
   `prodContenance` int(11) NOT NULL DEFAULT 0,
-  `dateMiseEnAvantDebut` date NOT NULL,
-  `dateMiseEnAvantfin` date NOT NULL,
+  `dateMiseEnAvantDebut` date DEFAULT NULL,
+  `dateMiseEnAvantfin` date DEFAULT NULL,
   `idCategorie` char(3) DEFAULT NULL,
   `marqueID` int(11) NOT NULL,
   PRIMARY KEY (`prodId`),
@@ -239,28 +238,28 @@ CREATE TABLE IF NOT EXISTS `produit` (
 --
 
 INSERT INTO `produit` (`prodId`, `prodDescription`, `prodPrix`, `prodImage`, `prodDateAjout`, `prodStock`, `prodContenance`, `dateMiseEnAvantDebut`, `dateMiseEnAvantfin`, `idCategorie`, `marqueID`) VALUES
-('c01', 'Laino Shampooing Douche Thé Vert BIO', 4.00, 'assets/images/laino-shampooing-douche-au-the-vert-bio-200ml.png', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'CH', 1),
-('c02', 'Klorane fibres de lin baume shampooing', 10.80, 'assets/images/klorane-fibres-de-lin-baume-apres-shampooing-150-ml.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'CH', 1),
-('c03', 'Weleda Kids 2in1 Orange fruitée', 4.00, 'assets/images/weleda-kids-2in1-shower-shampoo-orange-fruitee-150-ml.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'CH', 1),
-('c04', 'Weleda Kids 2in1 vanille douce', 4.00, 'assets/images/weleda-kids-2in1-shower-shampoo-vanille-douce-150-ml.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'CH', 1),
-('c05', 'Klorane Shampooing sec ortie', 6.10, 'assets/images/klorane-shampooing-sec-a-l-extrait-d-ortie-spray-150ml.png', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'CH', 1),
-('c06', 'Phytopulp mousse volume intense', 18.00, 'assets/images/phytopulp-mousse-volume-intense-200ml.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'CH', 1),
-('c07', 'Bio Beaute by Nuxe Shampooing nutritif', 8.00, 'assets/images/bio-beaute-by-nuxe-shampooing-nutritif-200ml.png', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'CH', 1),
-('c08', 'TEST', 100.00, NULL, '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', NULL, 1),
-('f01', 'Nuxe Men Contour des Yeux', 12.05, 'assets/images/nuxe-men-contour-des-yeux-multi-fonctions-15ml.png', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'FO', 1),
-('f02', 'Tisane romon nature sommirel bio', 5.50, 'assets/images/tisane-romon-nature-sommirel-bio-sachet-20.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'FO', 1),
-('f03', 'La Roche Posay Cicaplast crème', 11.00, 'assets/images/la-roche-posay-cicaplast-creme-pansement-40ml.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'FO', 1),
-('f04', 'Futuro sport stabilisateur cheville', 26.50, 'assets/images/futuro-sport-stabilisateur-pour-cheville-deluxe-attelle-cheville.png', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'FO', 1),
-('f05', 'Microlife pèse-personne électronique', 63.00, 'assets/images/microlife-pese-personne-electronique-weegschaal-ws80.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'FO', 1),
-('f06', 'Melapi Miel Thym Liquide 500g', 6.50, 'assets/images/melapi-miel-thym-liquide-500g.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'FO', 1),
-('f07', 'Meli Meliflor Pollen 200g', 8.60, 'assets/images/melapi-pollen-250g.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'FO', 1),
-('p01', 'Avène solaire Spray SPF50', 22.00, 'assets/images/avene-solaire-spray-tres-haute-protection-spf50200ml.png', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'PS', 1),
-('p02', 'Mustela Solaire Lait SPF50', 17.50, 'assets/images/mustela-solaire-lait-tres-haute-protection-spf50-100ml.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'PS', 1),
-('p03', 'Isdin Eryfotona aAK fluid', 29.00, 'assets/images/isdin-eryfotona-aak-fluid-100-50ml.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'PS', 1),
-('p04', 'La Roche Posay Anthélios Brume', 8.75, 'assets/images/la-roche-posay-anthelios-50-brume-visage-toucher-sec-75ml.png', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'PS', 1),
-('p05', 'Nuxe Sun Huile Lactée Capillaire', 15.00, 'assets/images/nuxe-sun-huile-lactee-capillaire-protectrice-100ml.png', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'PS', 1),
-('p06', 'Uriage Bariésun stick lèvres SPF30', 5.65, 'assets/images/uriage-bariesun-stick-levres-spf30-4g.jpg', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'PS', 1),
-('p07', 'Bioderma Cicabio creme SPF50+', 13.70, 'assets/images/bioderma-cicabio-creme-spf50-30ml.png', '2026-04-01', 0, 0, '2026-04-01', '2026-04-01', 'PS', 1);
+('c01', 'Laino Shampooing Douche Thé Vert BIO', 4.00, 'assets/images/laino-shampooing-douche-au-the-vert-bio-200ml.png', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
+('c02', 'Klorane fibres de lin baume shampooing', 10.80, 'assets/images/klorane-fibres-de-lin-baume-apres-shampooing-150-ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
+('c03', 'Weleda Kids 2in1 Orange fruitée', 4.00, 'assets/images/weleda-kids-2in1-shower-shampoo-orange-fruitee-150-ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
+('c04', 'Weleda Kids 2in1 vanille douce', 4.00, 'assets/images/weleda-kids-2in1-shower-shampoo-vanille-douce-150-ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
+('c05', 'Klorane Shampooing sec ortie', 6.10, 'assets/images/klorane-shampooing-sec-a-l-extrait-d-ortie-spray-150ml.png', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
+('c06', 'Phytopulp mousse volume intense', 18.00, 'assets/images/phytopulp-mousse-volume-intense-200ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
+('c07', 'Bio Beaute by Nuxe Shampooing nutritif', 8.00, 'assets/images/bio-beaute-by-nuxe-shampooing-nutritif-200ml.png', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
+('c08', 'TEST', 100.00, NULL, '2026-04-01', 0, 0, NULL, NULL, NULL, 1),
+('f01', 'Nuxe Men Contour des Yeux', 12.05, 'assets/images/nuxe-men-contour-des-yeux-multi-fonctions-15ml.png', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
+('f02', 'Tisane romon nature sommirel bio', 5.50, 'assets/images/tisane-romon-nature-sommirel-bio-sachet-20.jpg', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
+('f03', 'La Roche Posay Cicaplast crème', 11.00, 'assets/images/la-roche-posay-cicaplast-creme-pansement-40ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
+('f04', 'Futuro sport stabilisateur cheville', 26.50, 'assets/images/futuro-sport-stabilisateur-pour-cheville-deluxe-attelle-cheville.png', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
+('f05', 'Microlife pèse-personne électronique', 63.00, 'assets/images/microlife-pese-personne-electronique-weegschaal-ws80.jpg', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
+('f06', 'Melapi Miel Thym Liquide 500g', 6.50, 'assets/images/melapi-miel-thym-liquide-500g.jpg', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
+('f07', 'Meli Meliflor Pollen 200g', 8.60, 'assets/images/melapi-pollen-250g.jpg', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
+('p01', 'Avène solaire Spray SPF50', 22.00, 'assets/images/avene-solaire-spray-tres-haute-protection-spf50200ml.png', '2026-04-01', 0, 0, NULL, NULL, 'PS', 1),
+('p02', 'Mustela Solaire Lait SPF50', 17.50, 'assets/images/mustela-solaire-lait-tres-haute-protection-spf50-100ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'PS', 1),
+('p03', 'Isdin Eryfotona aAK fluid', 29.00, 'assets/images/isdin-eryfotona-aak-fluid-100-50ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'PS', 1),
+('p04', 'La Roche Posay Anthélios Brume', 8.75, 'assets/images/la-roche-posay-anthelios-50-brume-visage-toucher-sec-75ml.png', '2026-04-01', 0, 0, NULL, NULL, 'PS', 1),
+('p05', 'Nuxe Sun Huile Lactée Capillaire', 15.00, 'assets/images/nuxe-sun-huile-lactee-capillaire-protectrice-100ml.png', '2026-04-01', 0, 0, NULL, NULL, 'PS', 1),
+('p06', 'Uriage Bariésun stick lèvres SPF30', 5.65, 'assets/images/uriage-bariesun-stick-levres-spf30-4g.jpg', '2026-04-01', 0, 0, NULL, NULL, 'PS', 1),
+('p07', 'Bioderma Cicabio creme SPF50+', 13.70, 'assets/images/bioderma-cicabio-creme-spf50-30ml.png', '2026-04-01', 0, 0, NULL, NULL, 'PS', 1);
 
 -- --------------------------------------------------------
 

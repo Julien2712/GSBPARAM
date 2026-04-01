@@ -4,6 +4,7 @@ require_once $ctrlDir . '/ControleurVoirProduits.php';
 require_once $ctrlDir . '/ControleurAccueil.php';
 require_once $ctrlDir . '/ControleurGererPanier.php';
 require_once $ctrlDir . '/ControleurGererCategorie.php';
+require_once $ctrlDir . '/ControleurGererPoduit.php';
 
 // vérification explicite avant require
 if (!is_file($ctrlDir . '/ControleurUtilisateur.php')) {
@@ -19,6 +20,7 @@ class Routeur
     private $ctrlUtilisateur;
 
     private $ctrlGererCategorie;
+    private $ctrlGererProduit;
 
     public function __construct()
     {
@@ -27,6 +29,7 @@ class Routeur
         $this->ctrlGererPanier = new ControleurGererPanier();
         $this->ctrlUtilisateur = new ControleurUtilisateur();
         $this->ctrlGererCategorie = new ControleurGererCategorie();
+        $this->ctrlGererProduit = new ControleurGererProduit();
     }
 
     public function routerRequete()
@@ -108,6 +111,10 @@ class Routeur
 
             case 'gererCategorie':
                 $this->ctrlGererCategorie->gererCategorie();
+                break;
+
+            case 'gererProduit':
+                $this->ctrlGererProduit->gererProduit();
                 break;
 
             case 'utilisateur':
