@@ -493,7 +493,7 @@ class ModeleFront extends Modele
 	public function getLesInfosProduit($idProduit)
 	{
 		try {
-			$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, prodStock as stock, marqueID from produit where prodId ="' . $idProduit . '"';
+			$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, prodStock as stock, marqueID, prodContenance as contenance from produit where prodId ="' . $idProduit . '"';
 			$res = $this->executerRequete($req);
 			$laLigne = $res->fetch(PDO::FETCH_OBJ);
 			return $laLigne;
@@ -555,6 +555,48 @@ class ModeleFront extends Modele
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute([':id' => $idProduit]);
 			return true;
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function getAvisStatistiques($idProduit)
+	{
+		try {
+			$req = 'SELECT COUNT(*) as nbAvis, AVG(note) as moyenne FROM avis WHERE prodId = :id';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':id' => $idProduit]);
+			return $stmt->fetch(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function getProduitsAssocies($idProduit)
+	{
+		try {
+			$req = 'SELECT p.prodId as id, p.prodDescription as description, p.prodPrix as prix, p.prodImage as image ' .
+				   'FROM produit p ' .
+				   'JOIN associer a ON p.prodId = a.prodId_produit ' .
+				   'WHERE a.prodId = :id';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':id' => $idProduit]);
+			return $stmt->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function getMarque($marqueID)
+	{
+		try {
+			$req = 'SELECT marqueID as id, marqueLibelle as libelle FROM marque WHERE marqueID = :id';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':id' => $marqueID]);
+			return $stmt->fetch(PDO::FETCH_OBJ);
 		} catch (PDOException $e) {
 			print "Erreur !: " . $e->getMessage();
 			die();

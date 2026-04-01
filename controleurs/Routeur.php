@@ -63,6 +63,10 @@ class Routeur
                         $this->ctrlVoirProduits->voirTousLesProduits();
                         break;
                     }
+                    case 'voirDetails': {
+                        $this->ctrlVoirProduits->voirDetails($_REQUEST['produit']);
+                        break;
+                    }
                     case 'filtrer': {
                         $this->ctrlVoirProduits->filtrer();
                         break;

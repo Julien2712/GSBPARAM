@@ -90,6 +90,27 @@ class ControleurVoirProduits{
 		$pageContext = 'categorie';
         include("vues/v_choixCategorie.php");
 	}
+
+    /**
+     * Affiche les détails d'un produit
+     *
+     * @param string $idProduit l'identifiant du produit
+     */
+    public function voirDetails($idProduit) {
+        $produit = $this->modeleFront->getLesInfosProduit($idProduit);
+        
+        if ($produit) {
+            $avisStatistiques = $this->modeleFront->getAvisStatistiques($idProduit);
+            $produitsAssocies = $this->modeleFront->getProduitsAssocies($idProduit);
+            $categorie = $this->modeleFront->getLesInfosCategorie($produit->idCategorie);
+            $marque = $this->modeleFront->getMarque($produit->marqueID);
+            
+            include("vues/v_produitDetails.php");
+        } else {
+            // Gérer le cas où le produit n'existe pas
+            $this->voirProduits(null);
+        }
+    }
 }
 
 ?>
