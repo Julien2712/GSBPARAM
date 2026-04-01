@@ -43,10 +43,11 @@ class ControleurGererProduit
                 $image = isset($_POST['image']) ? trim($_POST['image']) : '';
                 $idCategorie = !empty($_POST['idCategorie']) ? $_POST['idCategorie'] : null;
                 $stock = isset($_POST['stock']) ? intval($_POST['stock']) : 0;
+                $contenance = isset($_POST['contenance']) ? intval($_POST['contenance']) : null;
                 $marqueID = isset($_POST['marqueID']) ? intval($_POST['marqueID']) : 1;
                 
                 if ($id !== '') {
-                    $this->modeleFront->creerProduit($id, $description, $prix, $image, $idCategorie, $stock, $marqueID);
+                    $this->modeleFront->creerProduit($id, $description, $prix, $image, $idCategorie, $stock, $marqueID, $contenance);
                 }
                 header("Location: index.php?uc=gererProduit&action=afficher");
                 break;
@@ -58,10 +59,11 @@ class ControleurGererProduit
                     $image = isset($_POST['image']) ? trim($_POST['image']) : '';
                     $idCategorie = !empty($_POST['idCategorie']) ? $_POST['idCategorie'] : null;
                     $stock = isset($_POST['stock']) ? intval($_POST['stock']) : 0;
+                    $contenance = isset($_POST['contenance']) ? intval($_POST['contenance']) : null;
                     $marqueID = isset($_POST['marqueID']) ? intval($_POST['marqueID']) : 1;
 
                     if ($idProduit) {
-                        $this->modeleFront->modifierProduit($idProduit, $description, $prix, $image, $idCategorie, $stock, $marqueID);
+                        $this->modeleFront->modifierProduit($idProduit, $description, $prix, $image, $idCategorie, $stock, $marqueID, $contenance);
                     }
                 }
                 header("Location: index.php?uc=gererProduit&action=afficher");

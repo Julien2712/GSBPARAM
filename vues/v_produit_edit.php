@@ -66,7 +66,7 @@
             </div>
 
             <div class="row mb-3">
-                <div class="col-6">
+                <div class="col-4">
                     <label for="prix" class="form-label">Prix du produit :</label>
                     <div class="input-group">
                         <input type="number" step="0.01" class="form-control" name="prix" id="prix"
@@ -74,10 +74,18 @@
                         <span class="input-group-text">€</span>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                     <label for="stock" class="form-label">Stock :</label>
                     <input type="number" class="form-control" name="stock" id="stock"
                         value="<?= $leProduit->stock ?>">
+                </div>
+                <div class="col-4">
+                    <label for="contenance" class="form-label">Contenance :</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="contenance" id="contenance"
+                            value="<?= htmlspecialchars($leProduit->contenance ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                        <span class="input-group-text">ml</span>
+                    </div>
                 </div>
             </div>
         </div>

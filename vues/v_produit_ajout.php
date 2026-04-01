@@ -70,9 +70,19 @@
                 <span class="input-group-text">€</span>
             </div>
         </div>
-        <div class="mb-3">
-            <label for="stock" class="form-label">Stock :</label>
-            <input type="number" class="form-control" name="stock" id="stock" value="0">
+
+        <div class="row mb-3">
+            <div class="col-6">
+                <label for="stock" class="form-label">Stock :</label>
+                <input type="number" class="form-control" name="stock" id="stock" value="0">
+            </div>
+            <div class="col-6">
+                <label for="contenance" class="form-label">Contenance (ex: 100) :</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" name="contenance" id="contenance" value="">
+                    <span class="input-group-text">ml</span>
+                </div>
+            </div>
         </div>
 
         <div class="row mt-4">

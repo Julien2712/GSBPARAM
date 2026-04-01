@@ -503,12 +503,12 @@ class ModeleFront extends Modele
 		}
 	}
 
-	public function creerProduit($id, $description, $prix, $image, $idCategorie = null, $stock = 0, $marqueID = 1)
+	public function creerProduit($id, $description, $prix, $image, $idCategorie = null, $stock = 0, $marqueID = 1, $contenance = null)
 	{
 		try {
 			$date = date('Y-m-d');
-			$req = "INSERT INTO produit (prodId, prodDescription, prodPrix, prodImage, prodDateAjout, idCategorie, marqueID, prodStock) 
-					VALUES (:id, :descr, :prix, :img, :date, :categ, :marque, :stock)";
+			$req = "INSERT INTO produit (prodId, prodDescription, prodPrix, prodImage, prodDateAjout, idCategorie, marqueID, prodStock, prodContenance) 
+					VALUES (:id, :descr, :prix, :img, :date, :categ, :marque, :stock, :cont)";
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute([
 				':id' => $id,
@@ -518,7 +518,8 @@ class ModeleFront extends Modele
 				':date' => $date,
 				':categ' => $idCategorie,
 				':marque' => $marqueID,
-				':stock' => $stock
+				':stock' => $stock,
+				':cont' => $contenance
 			]);
 			return true;
 		} catch (PDOException $e) {
@@ -527,10 +528,10 @@ class ModeleFront extends Modele
 		}
 	}
 
-	public function modifierProduit($idProduit, $description, $prix, $image, $idCategorie = null, $stock = 0, $marqueID = 1)
+	public function modifierProduit($idProduit, $description, $prix, $image, $idCategorie = null, $stock = 0, $marqueID = 1, $contenance = null)
 	{
 		try {
-			$req = "UPDATE produit SET prodDescription = :descr, prodPrix = :prix, prodImage = :img, idCategorie = :categ, prodStock = :stock, marqueID = :marque WHERE prodId = :id";
+			$req = "UPDATE produit SET prodDescription = :descr, prodPrix = :prix, prodImage = :img, idCategorie = :categ, prodStock = :stock, marqueID = :marque, prodContenance = :cont WHERE prodId = :id";
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute([
 				':id' => $idProduit,
@@ -539,7 +540,8 @@ class ModeleFront extends Modele
 				':img' => $image,
 				':categ' => $idCategorie,
 				':stock' => $stock,
-				':marque' => $marqueID
+				':marque' => $marqueID,
+				':cont' => $contenance
 			]);
 			return true;
 		} catch (PDOException $e) {

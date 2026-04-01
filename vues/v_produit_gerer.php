@@ -13,6 +13,7 @@
         $description = htmlspecialchars($unProduit->description ?? '', ENT_QUOTES, 'UTF-8');
         $prix = htmlspecialchars($unProduit->prix ?? '', ENT_QUOTES, 'UTF-8');
         $image = htmlspecialchars($unProduit->image ?? '', ENT_QUOTES, 'UTF-8');
+        $contenance = htmlspecialchars($unProduit->contenance ?? '', ENT_QUOTES, 'UTF-8');
         ?>
         <div class="produit-item border p-3 mb-2 rounded shadow-sm bg-white" id="produit-<?= $id ?>">
             <div class="d-flex justify-content-between align-items-center">
@@ -29,7 +30,7 @@
                     <div>
                         <strong>Nom :</strong> <?= $description ?><br>
                         <small class="text-muted">ID: <?= $id ?> | Prix: <?= $prix ?> € | Stock:
-                            <?= $unProduit->stock ?></small>
+                            <?= $unProduit->stock ?> | Contenance: <?= $contenance ?> ml</small>
                     </div>
                 </span>
                 <div class="d-flex gap-2">
