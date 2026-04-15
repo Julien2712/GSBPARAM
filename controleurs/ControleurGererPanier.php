@@ -59,18 +59,12 @@ class ControleurGererPanier
     {
         $this->initPanier();
         $id = (string) $idProduit;
-        // toujours incrémenter de 1 par défaut — traiter quantite comme "delta" seulement si c'est ±1
-        $q = 1;
-        if (isset($_REQUEST['quantite']) && is_numeric($_REQUEST['quantite'])) {
-            $val = (int) $_REQUEST['quantite'];
-            if ($val === 1 || $val === -1) {
-                $q = $val;
-            }
-        }
+        $q = max(1, (int)$quantite);
+        
         if (isset($_SESSION['produits'][$id])) {
             $_SESSION['produits'][$id] = (int) $_SESSION['produits'][$id] + $q;
         } else {
-            $_SESSION['produits'][$id] = max(0, $q);
+            $_SESSION['produits'][$id] = $q;
         }
         $this->sauvegarderPanierUtilisateurSiConnecte();
         $this->voirPanier();

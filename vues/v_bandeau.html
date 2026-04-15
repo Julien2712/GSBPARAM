@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if (session_status() === PHP_SESSION_NONE) session_start();
 $user = $_SESSION['utilisateur'] ?? null;
 ?>
@@ -24,16 +24,22 @@ $user = $_SESSION['utilisateur'] ?? null;
             <li><a href="index.php?uc=gererPanier&action=voirPanier"
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Mon panier</a></li>
 
-            <!-- Parties Admin (à faire)-->
+            <!-- Parties Admin -->
+            <?php if ($user && isset($user->habId) && $user->habId == 2): ?>
             <li><a href="index.php?uc=gererCategorie&action=afficher"
-                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer les catégories</a></li>
+                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer catégories</a></li>
             <li><a href="index.php?uc=gererProduit&action=afficher"
-                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer les produits</a></li>
+                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer produits</a></li>
+            <li><a href="index.php?uc=gererMiseEnAvant&action=afficher"
+                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer promotions</a></li>
+            <?php endif; ?>
             <!-- Connexion / Inscription (ou Déconnexion si connecté) -->
             <?php if ($user): ?>
             <li><span class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Bonjour
                 <?= htmlspecialchars($user->login ?? $user->nom ?? 'Utilisateur', ENT_QUOTES, 'UTF-8') ?>
               </span></li>
+            <li><a href="index.php?uc=utilisateur&action=espaceClient"
+                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Mon espace</a></li>
             <li><a href="index.php?uc=utilisateur&action=deconnexion"
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Déconnexion</a></li>
             <?php else: ?>

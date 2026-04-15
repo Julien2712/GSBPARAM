@@ -127,5 +127,18 @@ class ControleurUtilisateur
         header('Location: index.php');
         exit;
     }
+
+    public function afficherEspaceClient()
+    {
+        if (!isset($_SESSION['utilisateur'])) {
+            header('Location: index.php?uc=utilisateur&action=connexion');
+            exit;
+        }
+
+        $utiId = $_SESSION['utilisateur']->id;
+        $lesAvis = $this->modeleFront->getAvisUtilisateur($utiId);
+
+        include __DIR__ . '/../vues/v_espaceClient.php';
+    }
 }
 ?>

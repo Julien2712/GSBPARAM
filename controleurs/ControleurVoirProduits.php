@@ -105,10 +105,97 @@ class ControleurVoirProduits{
             $categorie = $this->modeleFront->getLesInfosCategorie($produit->idCategorie);
             $marque = $this->modeleFront->getMarque($produit->marqueID);
             
+            // Récupérer la liste des avis
+            $lesAvis = $this->modeleFront->getAvisProduit($idProduit);
+            
+            $aDejaDonneAvis = false;
+            // Vérifier si un utilisateur connecté a déjà donné un avis
+            if (isset($_SESSION['utilisateur'])) {
+                $aDejaDonneAvis = $this->modeleFront->aDejaDonneAvis($_SESSION['utilisateur']->id, $idProduit);
+            }
+
             include("vues/v_produitDetails.php");
         } else {
             // Gérer le cas où le produit n'existe pas
             $this->voirProduits(null);
+        }
+    }
+
+    /**
+     * Affiche le formulaire pour donner un avis
+     *
+     * @param string $idProduit l'identifiant du produit
+     */
+    public function donnerAvis($idProduit) {
+        if (!isset($_SESSION['utilisateur'])) {
+            // Rediriger vers connexion si non connecté
+            header('Location: index.php?uc=utilisateur&action=connexion');
+            exit;
+        }
+
+        $produit = $this->modeleFront->getLesInfosProduit($idProduit);
+        if ($produit) {
+            // Vérifier que l'utilisateur n'a pas déjà donné son avis
+            $aDejaDonneAvis = $this->modeleFront->aDejaDonneAvis($_SESSION['utilisateur']->id, $idProduit);
+            
+            if ($aDejaDonneAvis) {
+                // S'il a déjà donné son avis, le rediriger avec erreur ou l'afficher sur le detail du produit
+                header('Location: index.php?uc=voirProduits&produit=' . $idProduit . '&action=voirDetails&dejaAvis=1');
+                exit;
+            }
+
+            $marque = $this->modeleFront->getMarque($produit->marqueID);
+            $categorie = $this->modeleFront->getLesInfosCategorie($produit->idCategorie);
+            include("vues/v_donnerAvis.php");
+        } else {
+            $this->voirProduits(null);
+        }
+    }
+
+    /**
+     * Valide et enregistre un avis
+     *
+     * @param string $idProduit l'identifiant du produit concerné
+     * @param array $donnees POST contenant note et commentaire
+     */
+    public function validerAvis($idProduit, $donnees) {
+        if (!isset($_SESSION['utilisateur'])) {
+            header('Location: index.php?uc=utilisateur&action=connexion');
+            exit;
+        }
+
+        $msgErreurs = [];
+        $note = isset($donnees['note']) ? (int)$donnees['note'] : null;
+        $commentaire = isset($donnees['commentaire']) ? trim($donnees['commentaire']) : '';
+
+        if ($note === null || $note < 1 || $note > 5) {
+            $msgErreurs[] = "Vous devez attribuer une note entre 1 et 5.";
+        }
+
+        if (empty($msgErreurs)) {
+            $utiId = $_SESSION['utilisateur']->id;
+            
+            if (!$this->modeleFront->aDejaDonneAvis($utiId, $idProduit)) {
+                $succes = $this->modeleFront->ajouterAvis($utiId, $idProduit, $note, $commentaire);
+                if ($succes) {
+                    header('Location: index.php?uc=voirProduits&produit=' . $idProduit . '&action=voirDetails&avisAjoute=1');
+                    exit;
+                } else {
+                    $msgErreurs[] = "Une erreur est survenue lors de l'enregistrement de l'avis.";
+                }
+            } else {
+                $msgErreurs[] = "Vous avez déjà donné votre avis sur ce produit.";
+            }
+        }
+
+        // Si erreur, on re-affiche le formulaire
+        $produit = $this->modeleFront->getLesInfosProduit($idProduit);
+        if ($produit) {
+            $marque = $this->modeleFront->getMarque($produit->marqueID);
+            $categorie = $this->modeleFront->getLesInfosCategorie($produit->idCategorie);
+            include("vues/v_donnerAvis.php");
+        } else {
+             $this->voirProduits(null);
         }
     }
 }

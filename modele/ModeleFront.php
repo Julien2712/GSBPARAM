@@ -576,6 +576,68 @@ class ModeleFront extends Modele
 		}
 	}
 
+	public function getAvisProduit($idProduit)
+	{
+		try {
+			$req = 'SELECT a.note, a.date, a.description, u.utiLogin FROM avis a JOIN utilisateur u ON a.utiId = u.utiId WHERE a.prodId = :id ORDER BY a.date DESC';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':id' => $idProduit]);
+			return $stmt->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function aDejaDonneAvis($utiId, $prodId)
+	{
+		try {
+			$req = 'SELECT count(*) as nb FROM avis WHERE utiId = :utiId AND prodId = :prodId';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':utiId' => $utiId, ':prodId' => $prodId]);
+			$res = $stmt->fetch();
+			return $res['nb'] > 0;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
+	public function ajouterAvis($utiId, $prodId, $note, $description)
+	{
+		try {
+			$date = date('Y-m-d');
+			$req = 'INSERT INTO avis (utiId, prodId, note, date, description) VALUES (:utiId, :prodId, :note, :date, :description)';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([
+				':utiId' => $utiId,
+				':prodId' => $prodId,
+				':note' => $note,
+				':date' => $date,
+				':description' => $description
+			]);
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
+	public function getAvisUtilisateur($utiId)
+	{
+		try {
+			$req = 'SELECT a.note, a.date, a.description, p.prodId as idProduit, p.prodDescription as nomProduit, p.prodImage as imageProduit 
+					FROM avis a 
+					JOIN produit p ON a.prodId = p.prodId 
+					WHERE a.utiId = :utiId 
+					ORDER BY a.date DESC';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':utiId' => $utiId]);
+			return $stmt->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
 	public function getProduitsAssocies($idProduit)
 	{
 		try {
@@ -602,6 +664,78 @@ class ModeleFront extends Modele
 		} catch (PDOException $e) {
 			print "Erreur !: " . $e->getMessage();
 			die();
+		}
+	}
+
+	public function nettoyerPromotionsExpirees()
+	{
+		try {
+			$req = 'UPDATE produit SET dateMiseEnAvantDebut = NULL, dateMiseEnAvantfin = NULL WHERE dateMiseEnAvantfin < CURDATE()';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute();
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
+	public function getProduitsMisEnAvant()
+	{
+		try {
+			// Get products currently promoted
+			$req = 'SELECT prodId as id, prodDescription as description, prodPrix as prix, prodImage as image ' .
+				   'FROM produit ' .
+				   'WHERE dateMiseEnAvantDebut <= CURDATE() AND dateMiseEnAvantfin >= CURDATE()';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute();
+			return $stmt->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function getToutesProgrammationMiseEnAvant()
+	{
+		try {
+			$req = 'SELECT prodId as id, prodDescription as description, dateMiseEnAvantDebut as dateDebut, dateMiseEnAvantfin as dateFin ' .
+				   'FROM produit ' .
+				   'WHERE dateMiseEnAvantDebut IS NOT NULL AND dateMiseEnAvantfin IS NOT NULL ' .
+				   'ORDER BY dateMiseEnAvantDebut ASC';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute();
+			return $stmt->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function programmerMiseEnAvant($idProduit, $dateDebut, $dateFin)
+	{
+		try {
+			$req = 'UPDATE produit SET dateMiseEnAvantDebut = :dateDebut, dateMiseEnAvantfin = :dateFin WHERE prodId = :id';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([
+				':dateDebut' => $dateDebut,
+				':dateFin' => $dateFin,
+				':id' => $idProduit
+			]);
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
+	public function supprimerMiseEnAvant($idProduit)
+	{
+		try {
+			$req = 'UPDATE produit SET dateMiseEnAvantDebut = NULL, dateMiseEnAvantfin = NULL WHERE prodId = :id';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':id' => $idProduit]);
+			return true;
+		} catch (PDOException $e) {
+			return false;
 		}
 	}
 

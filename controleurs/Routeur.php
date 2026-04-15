@@ -5,6 +5,7 @@ require_once $ctrlDir . '/ControleurAccueil.php';
 require_once $ctrlDir . '/ControleurGererPanier.php';
 require_once $ctrlDir . '/ControleurGererCategorie.php';
 require_once $ctrlDir . '/ControleurGererPoduit.php';
+require_once $ctrlDir . '/ControleurMiseEnAvant.php';
 
 // vérification explicite avant require
 if (!is_file($ctrlDir . '/ControleurUtilisateur.php')) {
@@ -21,6 +22,7 @@ class Routeur
 
     private $ctrlGererCategorie;
     private $ctrlGererProduit;
+    private $ctrlMiseEnAvant;
 
     public function __construct()
     {
@@ -30,6 +32,7 @@ class Routeur
         $this->ctrlUtilisateur = new ControleurUtilisateur();
         $this->ctrlGererCategorie = new ControleurGererCategorie();
         $this->ctrlGererProduit = new ControleurGererProduit();
+        $this->ctrlMiseEnAvant = new ControleurMiseEnAvant();
     }
 
     public function routerRequete()
@@ -46,6 +49,10 @@ class Routeur
         switch ($uc) {
             case 'accueil':
                 $this->ctrlAccueil->accueil();
+                break;
+
+            case 'mentionsLegales':
+                $this->ctrlAccueil->mentionsLegales();
                 break;
 
             case 'voirProduits':
@@ -69,6 +76,14 @@ class Routeur
                     }
                     case 'filtrer': {
                         $this->ctrlVoirProduits->filtrer();
+                        break;
+                    }
+                    case 'donnerAvis': {
+                        $this->ctrlVoirProduits->donnerAvis($_REQUEST['produit']);
+                        break;
+                    }
+                    case 'validerAvis': {
+                        $this->ctrlVoirProduits->validerAvis($_REQUEST['produit'], $_POST);
                         break;
                     }
                 }
@@ -125,6 +140,10 @@ class Routeur
                 $this->ctrlGererProduit->gererProduit();
                 break;
 
+            case 'gererMiseEnAvant':
+                $this->ctrlMiseEnAvant->gerer();
+                break;
+
             case 'utilisateur':
                 switch ($action) {
                     case 'connexion': {
@@ -145,6 +164,10 @@ class Routeur
                     }
                     case 'creerCompte': {
                         $this->ctrlUtilisateur->creerCompte();
+                        break;
+                    }
+                    case 'espaceClient': {
+                        $this->ctrlUtilisateur->afficherEspaceClient();
                         break;
                     }
                     default: {
