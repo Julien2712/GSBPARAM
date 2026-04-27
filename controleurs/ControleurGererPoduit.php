@@ -25,7 +25,6 @@ class ControleurGererProduit
             case 'afficherAjouter':
                 $lesCategories = $this->modeleFront->getLesCategories();
                 $lesMarques = $this->modeleFront->getLesMarques();
-                $prochainID = count($this->modeleFront->getLesProduitsDuTableau()) + 1;
                 include("vues/v_produit_ajout.php");
                 break;
 
@@ -45,8 +44,49 @@ class ControleurGererProduit
                 $stock = isset($_POST['stock']) ? intval($_POST['stock']) : 0;
                 $contenance = isset($_POST['contenance']) ? intval($_POST['contenance']) : null;
                 $marqueID = isset($_POST['marqueID']) ? intval($_POST['marqueID']) : 1;
-                
+
                 if ($id !== '') {
+                    // Vérifier si le prix est valide (pas négatif)
+                    if (floatval($prix) < 0) {
+                        $erreur = "Le prix ne peut pas être négatif.";
+                        $lesCategories = $this->modeleFront->getLesCategories();
+                        $lesMarques = $this->modeleFront->getLesMarques();
+                        // Conserver les valeurs saisies
+                        $anciennesValeurs = [
+                            'id' => $id,
+                            'description' => $description,
+                            'prix' => $prix,
+                            'image' => $image,
+                            'idCategorie' => $idCategorie,
+                            'stock' => $stock,
+                            'contenance' => $contenance,
+                            'marqueID' => $marqueID
+                        ];
+                        include("vues/v_produit_ajout.php");
+                        break;
+                    }
+
+                    // Vérifier si l'ID existe déjà
+                    $produitExistant = $this->modeleFront->getLesInfosProduit($id);
+                    if ($produitExistant) {
+                        // L'ID existe déjà, réafficher le formulaire avec une erreur
+                        $erreur = "ID déjà existant pour un autre produit, veuillez choisir un autre ID";
+                        $lesCategories = $this->modeleFront->getLesCategories();
+                        $lesMarques = $this->modeleFront->getLesMarques();
+                        // Conserver les valeurs saisies
+                        $anciennesValeurs = [
+                            'id' => $id,
+                            'description' => $description,
+                            'prix' => $prix,
+                            'image' => $image,
+                            'idCategorie' => $idCategorie,
+                            'stock' => $stock,
+                            'contenance' => $contenance,
+                            'marqueID' => $marqueID
+                        ];
+                        include("vues/v_produit_ajout.php");
+                        break;
+                    }
                     $this->modeleFront->creerProduit($id, $description, $prix, $image, $idCategorie, $stock, $marqueID, $contenance);
                 }
                 header("Location: index.php?uc=gererProduit&action=afficher");

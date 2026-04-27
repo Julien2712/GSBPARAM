@@ -113,7 +113,7 @@ class ModeleFront extends Modele
 		try {
 			$req = "SELECT prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, marqueID FROM produit WHERE 1=1";
 			$params = [];
-			
+
 			if (!empty($idCategorie)) {
 				$req .= " AND idCategorie = :idCategorie";
 				$params[':idCategorie'] = $idCategorie;
@@ -130,13 +130,13 @@ class ModeleFront extends Modele
 				$req .= " AND marqueID = :marqueId";
 				$params[':marqueId'] = $marqueId;
 			}
-			
+
 			if ($prixMin !== null && $prixMin !== '' && $prixMax !== null && $prixMax !== '') {
-				if ((float)$prixMin > (float)$prixMax) {
+				if ((float) $prixMin > (float) $prixMax) {
 					throw new Exception("Erreur : le prix minimum est supérieur au prix maximum");
 				}
 			}
-			
+
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute($params);
 			return $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -222,7 +222,7 @@ class ModeleFront extends Modele
 
 			// 3. Insert into lignecommande (with deduplication and quantity count)
 			$counts = array_count_values($lesIdProduit);
-			
+
 			$reqL = "INSERT INTO lignecommande (ligneID, ligneQuantite, prodId, panierID) 
 					 VALUES (:lid, :qte, :pid, :panId)";
 			$stmtL = $this->getBdd()->prepare($reqL);
@@ -254,7 +254,7 @@ class ModeleFront extends Modele
 	public function getUserByLogin($login)
 	{
 		try {
-			$req = 'SELECT utiId as id, utiLogin as login, conMdp as motdepasse, utiNom as nom, utiMail as mail FROM utilisateur JOIN connexion ON utilisateur.conId = connexion.conId WHERE utiLogin = :login';
+			$req = 'SELECT utiId as id, utiLogin as login, conMdp as motdepasse, utiNom as nom, utiMail as mail, habId as habId FROM utilisateur JOIN connexion ON utilisateur.conId = connexion.conId WHERE utiLogin = :login';
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->bindParam(':login', $login, PDO::PARAM_STR);
 			$stmt->execute();
@@ -340,7 +340,7 @@ class ModeleFront extends Modele
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->bindParam(':id', $idUser, PDO::PARAM_INT);
 			$stmt->execute();
-			
+
 			$panier = [];
 			while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 				$panier[$row['prodId']] = $row['ligneQuantite'];
@@ -389,7 +389,8 @@ class ModeleFront extends Modele
 			$stmtL = $this->getBdd()->prepare($reqL);
 
 			foreach ($panierAssoc as $pid => $qte) {
-				if ($qte <= 0) continue;
+				if ($qte <= 0)
+					continue;
 				// Get next ligneID
 				$reqIdL = 'SELECT IFNULL(MAX(ligneID), 0) + 1 as nextId FROM lignecommande';
 				$resIdL = $this->getBdd()->query($reqIdL);
@@ -642,9 +643,9 @@ class ModeleFront extends Modele
 	{
 		try {
 			$req = 'SELECT p.prodId as id, p.prodDescription as description, p.prodPrix as prix, p.prodImage as image ' .
-				   'FROM produit p ' .
-				   'JOIN associer a ON p.prodId = a.prodId_produit ' .
-				   'WHERE a.prodId = :id';
+				'FROM produit p ' .
+				'JOIN associer a ON p.prodId = a.prodId_produit ' .
+				'WHERE a.prodId = :id';
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute([':id' => $idProduit]);
 			return $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -684,8 +685,8 @@ class ModeleFront extends Modele
 		try {
 			// Get products currently promoted
 			$req = 'SELECT prodId as id, prodDescription as description, prodPrix as prix, prodImage as image ' .
-				   'FROM produit ' .
-				   'WHERE dateMiseEnAvantDebut <= CURDATE() AND dateMiseEnAvantfin >= CURDATE()';
+				'FROM produit ' .
+				'WHERE dateMiseEnAvantDebut <= CURDATE() AND dateMiseEnAvantfin >= CURDATE()';
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute();
 			return $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -699,9 +700,9 @@ class ModeleFront extends Modele
 	{
 		try {
 			$req = 'SELECT prodId as id, prodDescription as description, dateMiseEnAvantDebut as dateDebut, dateMiseEnAvantfin as dateFin ' .
-				   'FROM produit ' .
-				   'WHERE dateMiseEnAvantDebut IS NOT NULL AND dateMiseEnAvantfin IS NOT NULL ' .
-				   'ORDER BY dateMiseEnAvantDebut ASC';
+				'FROM produit ' .
+				'WHERE dateMiseEnAvantDebut IS NOT NULL AND dateMiseEnAvantfin IS NOT NULL ' .
+				'ORDER BY dateMiseEnAvantDebut ASC';
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute();
 			return $stmt->fetchAll(PDO::FETCH_OBJ);

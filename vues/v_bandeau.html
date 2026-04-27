@@ -25,14 +25,12 @@ $user = $_SESSION['utilisateur'] ?? null;
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Mon panier</a></li>
 
             <!-- Parties Admin -->
-            <?php if ($user && isset($user->habId) && $user->habId == 2): ?>
             <li><a href="index.php?uc=gererCategorie&action=afficher"
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer catégories</a></li>
             <li><a href="index.php?uc=gererProduit&action=afficher"
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer produits</a></li>
             <li><a href="index.php?uc=gererMiseEnAvant&action=afficher"
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer promotions</a></li>
-            <?php endif; ?>
             <!-- Connexion / Inscription (ou Déconnexion si connecté) -->
             <?php if ($user): ?>
             <li><span class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Bonjour
