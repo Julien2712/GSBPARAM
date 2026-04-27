@@ -412,11 +412,12 @@ class ModeleFront extends Modele
 		}
 	}
 
-	public function creerCategorie($libelle)
+	public function creerCategorie($id, $libelle)
 	{
 		try {
-			$req = 'INSERT INTO categorie (libelle) VALUES (:libelle)';
+			$req = 'INSERT INTO categorie (id, libelle) VALUES (:id, :libelle)';
 			$stmt = $this->getBdd()->prepare($req);
+			$stmt->bindParam(':id', $id, PDO::PARAM_STR);
 			$stmt->bindParam(':libelle', $libelle, PDO::PARAM_STR);
 			$stmt->execute();
 			return true;

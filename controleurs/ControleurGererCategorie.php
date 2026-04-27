@@ -26,6 +26,10 @@ class ControleurGererCategorie
                 include("vues/v_modifierCategorie.php");
                 break;
 
+            case 'afficherAjouter':
+                include("vues/v_ajouterCategorie.php");
+                break;
+
             case 'ajouterProduit':
                 $laCategorie = $this->modeleFront->getLesInfosCategorie($idCategorie);
                 $lesProduitsSansCategorie = $this->modeleFront->getLesProduitsSansCategorie();
@@ -33,8 +37,9 @@ class ControleurGererCategorie
                 break;
 
             case 'ajouter':
+                $id = isset($_POST['id']) ? $_POST['id'] : '';
                 $libelle = isset($_POST['libelle']) ? $_POST['libelle'] : '';
-                $this->modeleFront->creerCategorie($libelle);
+                $this->modeleFront->creerCategorie($id, $libelle);
                 header("Location: index.php?uc=gererCategorie&action=afficher");
                 break;
 
