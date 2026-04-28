@@ -742,4 +742,16 @@ class ModeleFront extends Modele
 	}
 
 }
+
+// Vérifie si un utilisateur est connecté
+function estConnecte(): bool
+{
+	return isset($_SESSION['utilisateur']) && !empty($_SESSION['utilisateur']);
+}
+
+// Vérifie si l'utilisateur connecté est administrateur (habId == 2)
+function estAdmin(): bool
+{
+	return estConnecte() && isset($_SESSION['utilisateur']->habId) && (int) $_SESSION['utilisateur']->habId === 2;
+}
 ?>
