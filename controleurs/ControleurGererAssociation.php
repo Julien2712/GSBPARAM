@@ -37,6 +37,25 @@ class ControleurGererAssociation
                 }
                 header("Location: index.php?uc=gererAssociation&action=afficher");
                 break;
+
+            case 'afficherModifier':
+                $prodId = isset($_GET['prodId']) ? $_GET['prodId'] : '';
+                $prodIdAssocie = isset($_GET['prodIdAssocie']) ? $_GET['prodIdAssocie'] : '';
+                $lesProduits = $this->modeleFront->getLesProduitsDuTableau();
+                include("vues/v_association_edit.php");
+                break;
+
+            case 'modifier':
+                $ancienProdId = isset($_POST['ancienProdId']) ? $_POST['ancienProdId'] : '';
+                $ancienProdIdAssocie = isset($_POST['ancienProdIdAssocie']) ? $_POST['ancienProdIdAssocie'] : '';
+                $nouveauProdId = isset($_POST['prodId']) ? $_POST['prodId'] : '';
+                $nouveauProdIdAssocie = isset($_POST['prodIdAssocie']) ? $_POST['prodIdAssocie'] : '';
+                
+                if (!empty($ancienProdId) && !empty($ancienProdIdAssocie) && !empty($nouveauProdId) && !empty($nouveauProdIdAssocie) && $nouveauProdId !== $nouveauProdIdAssocie) {
+                    $this->modeleFront->modifierAssociation($ancienProdId, $ancienProdIdAssocie, $nouveauProdId, $nouveauProdIdAssocie);
+                }
+                header("Location: index.php?uc=gererAssociation&action=afficher");
+                break;
         }
     }
 }

@@ -48,6 +48,10 @@
                     <strong>Associé à :</strong> <?= htmlspecialchars($uneAssociation->descriptionProduitAssocie, ENT_QUOTES, 'UTF-8') ?> (<?= $uneAssociation->prodId_produit ?>)
                 </span>
                 <div class="d-flex gap-2">
+                    <a href="index.php?uc=gererAssociation&prodId=<?= $uneAssociation->prodId ?>&prodIdAssocie=<?= $uneAssociation->prodId_produit ?>&action=afficherModifier"
+                        class="btn btn-warning btn-sm" type="button">
+                        Modifier
+                    </a>
                     <a href="index.php?uc=gererAssociation&prodId=<?= $uneAssociation->prodId ?>&prodIdAssocie=<?= $uneAssociation->prodId_produit ?>&action=supprimer"
                         class="btn btn-danger btn-sm" type="button"
                         onclick="return confirm('Voulez-vous vraiment supprimer cette association ?');">
@@ -58,3 +62,37 @@
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const selectProdId = document.getElementById("prodId");
+    const selectProdIdAssocie = document.getElementById("prodIdAssocie");
+
+    if (selectProdId && selectProdIdAssocie) {
+        function updateSelectOptions() {
+            const val1 = selectProdId.value;
+            const val2 = selectProdIdAssocie.value;
+
+            // Pour selectProdIdAssocie, on cache l'option choisie dans selectProdId
+            Array.from(selectProdIdAssocie.options).forEach(opt => {
+                if(opt.value !== "") {
+                    opt.style.display = (opt.value === val1) ? 'none' : '';
+                }
+            });
+
+            // Pour selectProdId, on cache l'option choisie dans selectProdIdAssocie
+            Array.from(selectProdId.options).forEach(opt => {
+                if(opt.value !== "") {
+                    opt.style.display = (opt.value === val2) ? 'none' : '';
+                }
+            });
+        }
+
+        selectProdId.addEventListener("change", updateSelectOptions);
+        selectProdIdAssocie.addEventListener("change", updateSelectOptions);
+        
+        // Initialiser au chargement si des valeurs sont déjà sélectionnées
+        updateSelectOptions();
+    }
+});
+</script>

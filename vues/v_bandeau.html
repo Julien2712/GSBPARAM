@@ -26,14 +26,18 @@ $user = $_SESSION['utilisateur'] ?? null;
 
             <!-- Parties Admin -->
             <?php if (estAdmin()): ?>
-            <li><a href="index.php?uc=gererCategorie&action=afficher"
-                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer catégories</a></li>
-            <li><a href="index.php?uc=gererProduit&action=afficher"
-                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer produits</a></li>
-            <li><a href="index.php?uc=gererMiseEnAvant&action=afficher"
-                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer mise en avant</a></li>
-            <li><a href="index.php?uc=gererAssociation&action=afficher"
-                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Gérer associations</a></li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle rounded-pill px-3 mx-1 fw-bold link-dark" href="#"
+                id="navbarDropdownGerer" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Gérer
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdownGerer">
+                <li><a class="dropdown-item" href="index.php?uc=gererCategorie&action=afficher">Catégories</a></li>
+                <li><a class="dropdown-item" href="index.php?uc=gererProduit&action=afficher">Produits</a></li>
+                <li><a class="dropdown-item" href="index.php?uc=gererMiseEnAvant&action=afficher">Mise en avant</a></li>
+                <li><a class="dropdown-item" href="index.php?uc=gererAssociation&action=afficher">Associations</a></li>
+              </ul>
+            </li>
             <?php endif; ?>
             <!-- Connexion / Inscription (ou Déconnexion si connecté) -->
             <?php if ($user): ?>
@@ -43,12 +47,12 @@ $user = $_SESSION['utilisateur'] ?? null;
             <li><a href="index.php?uc=utilisateur&action=espaceClient"
                 class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Mon espace</a></li>
             <li><a href="index.php?uc=utilisateur&action=deconnexion"
-                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Déconnexion</a></li>
+                class="btn btn-danger rounded-pill px-3 mx-1 fw-bold text-white">Déconnexion</a></li>
             <?php else: ?>
             <li><a href="index.php?uc=utilisateur&action=connexion"
-                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Connexion</a></li>
+                class="btn btn-primary rounded-pill px-3 mx-1 fw-bold text-white">Connexion</a></li>
             <li><a href="index.php?uc=utilisateur&action=inscription"
-                class="nav-link rounded-pill px-3 mx-1 fw-bold link-dark">Inscription</a></li>
+                class="btn btn-warning rounded-pill px-3 mx-1 fw-bold text-dark">Inscription</a></li>
             <?php endif; ?>
           </ul>
         </div>

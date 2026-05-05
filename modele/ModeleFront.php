@@ -81,14 +81,14 @@ class ModeleFront extends Modele
 			$lesProduits = array();
 			if ($desIdsProduit != null) {
 				foreach ($desIdsProduit as $unIdProduit) {
-					$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie from produit where prodId = "' . $unIdProduit . '"';
+					$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, prodStock as stock, marqueID, prodContenance as contenance from produit where prodId = "' . $unIdProduit . '"';
 					$res = $this->executerRequete($req);
 					$unProduit = $res->fetch(PDO::FETCH_OBJ);
 					$lesProduits[] = $unProduit;
 				}
 			} else // on souhaite tous les produits
 			{
-				$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, prodStock as stock, marqueID from produit;';
+				$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, prodStock as stock, marqueID, prodContenance as contenance from produit;';
 				$res = $this->executerRequete($req);
 				$lesProduits = $res->fetchAll(PDO::FETCH_OBJ);
 			}
@@ -721,6 +721,21 @@ class ModeleFront extends Modele
 			$stmt->bindParam(':prodIdAssocie2', $prodIdAssocie, PDO::PARAM_STR);
 			$stmt->execute();
 			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Modifie une association entre deux produits
+	 */
+	public function modifierAssociation($ancienProdId, $ancienProdIdAssocie, $nouveauProdId, $nouveauProdIdAssocie)
+	{
+		try {
+			// On supprime l'ancienne association
+			$this->supprimerAssociation($ancienProdId, $ancienProdIdAssocie);
+			// On ajoute la nouvelle association
+			return $this->ajouterAssociation($nouveauProdId, $nouveauProdIdAssocie);
 		} catch (PDOException $e) {
 			return false;
 		}
