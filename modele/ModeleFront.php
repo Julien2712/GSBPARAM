@@ -646,9 +646,14 @@ class ModeleFront extends Modele
 			$req = 'SELECT p.prodId as id, p.prodDescription as description, p.prodPrix as prix, p.prodImage as image ' .
 				'FROM produit p ' .
 				'JOIN associer a ON p.prodId = a.prodId_produit ' .
-				'WHERE a.prodId = :id';
+				'WHERE a.prodId = :id1 ' .
+				'UNION ' .
+				'SELECT p.prodId as id, p.prodDescription as description, p.prodPrix as prix, p.prodImage as image ' .
+				'FROM produit p ' .
+				'JOIN associer a ON p.prodId = a.prodId ' .
+				'WHERE a.prodId_produit = :id2';
 			$stmt = $this->getBdd()->prepare($req);
-			$stmt->execute([':id' => $idProduit]);
+			$stmt->execute([':id1' => $idProduit, ':id2' => $idProduit]);
 			return $stmt->fetchAll(PDO::FETCH_OBJ);
 		} catch (PDOException $e) {
 			print "Erreur !: " . $e->getMessage();
@@ -708,10 +713,12 @@ class ModeleFront extends Modele
 	public function supprimerAssociation($prodId, $prodIdAssocie)
 	{
 		try {
-			$req = 'DELETE FROM associer WHERE prodId = :prodId AND prodId_produit = :prodIdAssocie';
+			$req = 'DELETE FROM associer WHERE (prodId = :prodId AND prodId_produit = :prodIdAssocie) OR (prodId = :prodIdAssocie2 AND prodId_produit = :prodId2)';
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->bindParam(':prodId', $prodId, PDO::PARAM_STR);
 			$stmt->bindParam(':prodIdAssocie', $prodIdAssocie, PDO::PARAM_STR);
+			$stmt->bindParam(':prodId2', $prodId, PDO::PARAM_STR);
+			$stmt->bindParam(':prodIdAssocie2', $prodIdAssocie, PDO::PARAM_STR);
 			$stmt->execute();
 			return true;
 		} catch (PDOException $e) {
