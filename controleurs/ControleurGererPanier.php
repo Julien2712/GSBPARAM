@@ -11,7 +11,7 @@ class ControleurGererPanier
             session_start();
 
         require_once __DIR__ . '/../modele/ModeleFront.php';
-        
+
         // Bloquer l'accès au panier si l'utilisateur n'est pas connecté
         // On vérifie que le "uc" est bien "gererPanier" pour éviter une boucle sur les autres pages
         if (!estConnecte() && isset($_REQUEST['uc']) && $_REQUEST['uc'] === 'gererPanier') {
@@ -69,8 +69,8 @@ class ControleurGererPanier
     {
         $this->initPanier();
         $id = (string) $idProduit;
-        $q = max(1, (int)$quantite);
-        
+        $q = max(1, (int) $quantite);
+
         if (isset($_SESSION['produits'][$id])) {
             $_SESSION['produits'][$id] = (int) $_SESSION['produits'][$id] + $q;
         } else {
@@ -232,7 +232,7 @@ class ControleurGererPanier
         $lesIdProduit = $this->getLesIdProduitsDuPanier();
         $idsUniques = array_unique($lesIdProduit);
         $lesProduits = $this->modeleFront->getLesProduitsDuTableau($idsUniques);
-        
+
         // Construction d'un tableau associatif id => stock disponible
         $stocksDisponibles = [];
         foreach ($lesProduits as $p) {
