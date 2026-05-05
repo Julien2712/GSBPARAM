@@ -58,7 +58,7 @@ class ControleurUtilisateur
                 $_SESSION['panier_fusionne'] = true;
             }
 
-            header('Location: index.php');
+            echo '<script>window.location.href="index.php";</script>';
             exit;
         }
 
@@ -110,7 +110,7 @@ class ControleurUtilisateur
             $_SESSION['panier_fusionne'] = true;
         }
 
-        header('Location: index.php');
+        echo '<script>window.location.href="index.php";</script>';
         exit;
     }
 
@@ -124,7 +124,7 @@ class ControleurUtilisateur
         unset($_SESSION['utilisateur']);
         $_SESSION['produits'] = [];
         unset($_SESSION['panier_fusionne']);
-        header('Location: index.php');
+        echo '<script>window.location.href="index.php";</script>';
         exit;
     }
 

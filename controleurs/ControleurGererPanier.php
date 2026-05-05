@@ -12,8 +12,9 @@ class ControleurGererPanier
 
         require_once __DIR__ . '/../modele/ModeleFront.php';
         
-        // Bloquer l'accès complet au panier si l'utilisateur n'est pas connecté
-        if (!estConnecte()) {
+        // Bloquer l'accès au panier si l'utilisateur n'est pas connecté
+        // On vérifie que le "uc" est bien "gererPanier" pour éviter une boucle sur les autres pages
+        if (!estConnecte() && isset($_REQUEST['uc']) && $_REQUEST['uc'] === 'gererPanier') {
             echo '<script>window.location.href="index.php?uc=utilisateur&action=connexion";</script>';
             exit;
         }
