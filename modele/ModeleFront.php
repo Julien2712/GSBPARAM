@@ -656,6 +656,69 @@ class ModeleFront extends Modele
 		}
 	}
 
+	/**
+	 * Retourne toutes les associations avec les descriptions des produits
+	 *
+	 * @return array un tableau des associations (tableau d'objets)
+	 */
+	public function getLesAssociations()
+	{
+		try {
+			$req = 'SELECT a.prodId, p1.prodDescription as descriptionProduit, a.prodId_produit, p2.prodDescription as descriptionProduitAssocie ' .
+				'FROM associer a ' .
+				'JOIN produit p1 ON a.prodId = p1.prodId ' .
+				'JOIN produit p2 ON a.prodId_produit = p2.prodId ' .
+				'ORDER BY a.prodId, a.prodId_produit';
+			$res = $this->executerRequete($req);
+			return $res->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	/**
+	 * Ajoute une association entre deux produits
+	 *
+	 * @param string $prodId l'id du produit principal
+	 * @param string $prodIdAssocie l'id du produit associé
+	 * @return bool true si l'ajout a réussi
+	 */
+	public function ajouterAssociation($prodId, $prodIdAssocie)
+	{
+		try {
+			$req = 'INSERT INTO associer (prodId, prodId_produit) VALUES (:prodId, :prodIdAssocie)';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->bindParam(':prodId', $prodId, PDO::PARAM_STR);
+			$stmt->bindParam(':prodIdAssocie', $prodIdAssocie, PDO::PARAM_STR);
+			$stmt->execute();
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Supprime une association entre deux produits
+	 *
+	 * @param string $prodId l'id du produit principal
+	 * @param string $prodIdAssocie l'id du produit associé
+	 * @return bool true si la suppression a réussi
+	 */
+	public function supprimerAssociation($prodId, $prodIdAssocie)
+	{
+		try {
+			$req = 'DELETE FROM associer WHERE prodId = :prodId AND prodId_produit = :prodIdAssocie';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->bindParam(':prodId', $prodId, PDO::PARAM_STR);
+			$stmt->bindParam(':prodIdAssocie', $prodIdAssocie, PDO::PARAM_STR);
+			$stmt->execute();
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
 	public function getMarque($marqueID)
 	{
 		try {
