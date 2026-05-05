@@ -9,6 +9,15 @@ class ControleurGererPanier
     {
         if (session_status() === PHP_SESSION_NONE)
             session_start();
+
+        require_once __DIR__ . '/../modele/ModeleFront.php';
+        
+        // Bloquer l'accès complet au panier si l'utilisateur n'est pas connecté
+        if (!estConnecte()) {
+            echo '<script>window.location.href="index.php?uc=utilisateur&action=connexion";</script>';
+            exit;
+        }
+
         $this->modeleFront = new ModeleFront();
         $this->initPanier();
         // si utilisateur connecté, fusionner le panier DB avec celui en session (une seule fois par session)
@@ -220,6 +229,33 @@ class ControleurGererPanier
         }
 
         $lesIdProduit = $this->getLesIdProduitsDuPanier();
+        $idsUniques = array_unique($lesIdProduit);
+        $lesProduits = $this->modeleFront->getLesProduitsDuTableau($idsUniques);
+        
+        // Construction d'un tableau associatif id => stock disponible
+        $stocksDisponibles = [];
+        foreach ($lesProduits as $p) {
+            $stocksDisponibles[$p->id] = (int) $p->stock;
+        }
+
+        $quantitesDemandees = array_count_values($lesIdProduit);
+
+        // Vérification du stock
+        foreach ($quantitesDemandees as $pid => $qte) {
+            if (!isset($stocksDisponibles[$pid]) || $stocksDisponibles[$pid] < $qte) {
+                // S'il n'y a pas assez de stock, on renvoie une erreur
+                $nom = htmlspecialchars($nom, ENT_QUOTES, 'UTF-8');
+                $rue = htmlspecialchars($rue, ENT_QUOTES, 'UTF-8');
+                $cp = htmlspecialchars($cp, ENT_QUOTES, 'UTF-8');
+                $ville = htmlspecialchars($ville, ENT_QUOTES, 'UTF-8');
+                $mail = htmlspecialchars($mail, ENT_QUOTES, 'UTF-8');
+                $erreur = "Stock insuffisant pour le produit ID: " . htmlspecialchars($pid, ENT_QUOTES, 'UTF-8') . ". Quantité demandée: $qte, Stock disponible: " . ($stocksDisponibles[$pid] ?? 0) . ". Veuillez modifier votre panier.";
+                include(__DIR__ . '/../vues/v_commande.php');
+                return;
+            }
+        }
+
+        // Si tout est bon, on crée la commande
         $this->modeleFront->creerCommande(
             htmlspecialchars($nom, ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($rue, ENT_QUOTES, 'UTF-8'),

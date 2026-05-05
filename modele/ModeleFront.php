@@ -239,6 +239,11 @@ class ModeleFront extends Modele
 					':pid' => $pid,
 					':panId' => $panierID
 				]);
+
+				// Mise à jour du stock
+				$reqUpd = "UPDATE produit SET prodStock = prodStock - :qte WHERE prodId = :pid AND prodStock >= :qte";
+				$stmtUpd = $this->getBdd()->prepare($reqUpd);
+				$stmtUpd->execute([':qte' => $qte, ':pid' => $pid]);
 			}
 
 			$this->getBdd()->commit();
@@ -822,6 +827,81 @@ class ModeleFront extends Modele
 			$stmt->execute([':id' => $idProduit]);
 			return true;
 		} catch (PDOException $e) {
+			return false;
+		}
+	}
+	public function getInfosCommande($idCommande)
+	{
+		try {
+			$req = "SELECT pc.panierDate as dateCommande, pc.etatCommande as etat, 
+                           u.utiNom as nom, u.utiMail as mail, u.utiCp as cp, u.utiVille as ville, u.utiAdresse as adresse 
+					FROM panier_commande pc 
+					LEFT JOIN utilisateur u ON pc.utiId = u.utiId 
+					WHERE pc.panierID = :id";
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':id' => $idCommande]);
+			return $stmt->fetch(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			return null;
+		}
+	}
+
+	public function getDetailsCommande($idCommande)
+	{
+		try {
+			$req = "SELECT p.prodId as id, p.prodDescription as description, p.prodPrix as prix, lc.ligneQuantite as quantite 
+					FROM lignecommande lc 
+					JOIN produit p ON lc.prodId = p.prodId 
+					WHERE lc.panierID = :id";
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':id' => $idCommande]);
+			return $stmt->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			return [];
+		}
+	}
+
+	public function getLesCommandes()
+	{
+		try {
+			$req = "SELECT panierID as id, panierDate as date, etatCommande as etat, utiId as utilisateurId FROM panier_commande WHERE etatCommande != 'en_cours' ORDER BY panierDate DESC";
+			$res = $this->executerRequete($req);
+			return $res->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			return [];
+		}
+	}
+	public function changerEtatCommande($idCommande, $nouvelEtat)
+	{
+		try {
+			$req = "UPDATE panier_commande SET etatCommande = :etat WHERE panierID = :id";
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':etat' => $nouvelEtat, ':id' => $idCommande]);
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
+	public function supprimerCommande($idCommande)
+	{
+		try {
+			$this->getBdd()->beginTransaction();
+
+			// Supprimer d'abord les lignes de commande (contrainte de clé étrangère)
+			$reqDelLignes = "DELETE FROM lignecommande WHERE panierID = :id";
+			$stmtLignes = $this->getBdd()->prepare($reqDelLignes);
+			$stmtLignes->execute([':id' => $idCommande]);
+
+			// Ensuite supprimer la commande
+			$reqDelPanier = "DELETE FROM panier_commande WHERE panierID = :id";
+			$stmtPanier = $this->getBdd()->prepare($reqDelPanier);
+			$stmtPanier->execute([':id' => $idCommande]);
+
+			$this->getBdd()->commit();
+			return true;
+		} catch (PDOException $e) {
+			$this->getBdd()->rollBack();
 			return false;
 		}
 	}

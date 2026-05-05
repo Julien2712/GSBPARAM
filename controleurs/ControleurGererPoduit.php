@@ -89,7 +89,8 @@ class ControleurGererProduit
                     }
                     $this->modeleFront->creerProduit($id, $description, $prix, $image, $idCategorie, $stock, $marqueID, $contenance);
                 }
-                header("Location: index.php?uc=gererProduit&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererProduit&action=afficher";</script>';
+                exit;
                 break;
 
             case 'modifier':
@@ -106,14 +107,16 @@ class ControleurGererProduit
                         $this->modeleFront->modifierProduit($idProduit, $description, $prix, $image, $idCategorie, $stock, $marqueID, $contenance);
                     }
                 }
-                header("Location: index.php?uc=gererProduit&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererProduit&action=afficher";</script>';
+                exit;
                 break;
 
             case 'supprimer':
                 if ($idProduit) {
                     $this->modeleFront->supprimerProduit($idProduit);
                 }
-                header("Location: index.php?uc=gererProduit&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererProduit&action=afficher";</script>';
+                exit;
                 break;
         }
     }
