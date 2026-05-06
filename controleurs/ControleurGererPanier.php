@@ -71,6 +71,22 @@ class ControleurGererPanier
         $id = (string) $idProduit;
         $q = max(1, (int) $quantite);
 
+        // Vérifier le stock avant d'ajouter
+        $produit = $this->modeleFront->getLesInfosProduit($id);
+        if (!$produit || (int)$produit->stock <= 0) {
+            $message = "Ce produit est en rupture de stock et ne peut pas être ajouté au panier.";
+            include(__DIR__ . '/../vues/v_message.php');
+            return;
+        }
+
+        // Vérifier que la quantité demandée ne dépasse pas le stock disponible
+        $quantiteDejaEnPanier = isset($_SESSION['produits'][$id]) ? (int)$_SESSION['produits'][$id] : 0;
+        if (($quantiteDejaEnPanier + $q) > (int)$produit->stock) {
+            $message = "Stock insuffisant pour ce produit. Stock disponible : " . $produit->stock . ", déjà dans le panier : " . $quantiteDejaEnPanier . ".";
+            include(__DIR__ . '/../vues/v_message.php');
+            return;
+        }
+
         if (isset($_SESSION['produits'][$id])) {
             $_SESSION['produits'][$id] = (int) $_SESSION['produits'][$id] + $q;
         } else {

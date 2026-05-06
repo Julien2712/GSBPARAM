@@ -60,7 +60,7 @@ class ModeleFront extends Modele
 	public function getLesProduitsDeCategorie($idCategorie)
 	{
 		try {
-			$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie from produit where idCategorie ="' . $idCategorie . '"';
+			$req = 'select prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, prodStock as stock from produit where idCategorie ="' . $idCategorie . '"';
 			$res = $this->executerRequete($req);
 			$lesLignes = $res->fetchAll(PDO::FETCH_OBJ);
 			return $lesLignes;
@@ -111,7 +111,7 @@ class ModeleFront extends Modele
 	public function getLesProduitsFiltres($idCategorie = null, $prixMin = null, $prixMax = null, $marqueId = null)
 	{
 		try {
-			$req = "SELECT prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, marqueID FROM produit WHERE 1=1";
+			$req = "SELECT prodId as id, prodDescription as description, prodPrix as prix, prodImage as image, idCategorie, marqueID, prodStock as stock FROM produit WHERE 1=1";
 			$params = [];
 
 			if (!empty($idCategorie)) {
