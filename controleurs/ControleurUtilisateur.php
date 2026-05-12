@@ -84,10 +84,16 @@ class ControleurUtilisateur
         $mail = trim($_POST['mail'] ?? '');
         $msgErreurs = [];
 
-        if ($login === '' || $mdp === '' || $mdp2 === '')
+        if ($login === '' || $mdp === '' || $mdp2 === '') {
             $msgErreurs[] = 'Tous les champs obligatoires.';
-        if ($mdp !== $mdp2)
-            $msgErreurs[] = 'Les mots de passe ne correspondent pas.';
+        } else {
+            if ($mdp !== $mdp2) {
+                $msgErreurs[] = 'Les mots de passe ne correspondent pas.';
+            }
+            if (strlen($mdp) < 12 || !preg_match('/[A-Z]/', $mdp) || !preg_match('/[a-z]/', $mdp) || !preg_match('/[0-9]/', $mdp) || !preg_match('/[^a-zA-Z0-9]/', $mdp)) {
+                $msgErreurs[] = 'Le mot de passe doit contenir au moins 12 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.';
+            }
+        }
         if ($this->modeleFront->getUserByLogin($login))
             $msgErreurs[] = 'Login déjà utilisé.';
 

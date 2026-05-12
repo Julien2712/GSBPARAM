@@ -51,7 +51,8 @@
         <div class="row mb-3">
             <div class="col-md-6 mb-3 mb-md-0">
                 <label for="mdp" class="form-label"><strong>Mot de passe * :</strong></label>
-                <input type="password" class="form-control" name="mdp" id="mdp" required>
+                <input type="password" class="form-control" name="mdp" id="mdp" required minlength="12" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{12,}" title="Le mot de passe doit contenir au moins 12 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.">
+                <div class="form-text">Min 12 caractères, 1 maj, 1 min, 1 chiffre, 1 caractère spécial.</div>
             </div>
             <div class="col-md-6">
                 <label for="mdp2" class="form-label"><strong>Confirmer * :</strong></label>
