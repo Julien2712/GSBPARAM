@@ -565,8 +565,7 @@ class ModeleFront extends Modele
 			$stmt->execute([':id' => $idProduit]);
 			return true;
 		} catch (PDOException $e) {
-			print "Erreur !: " . $e->getMessage();
-			die();
+			return false;
 		}
 	}
 
@@ -697,6 +696,17 @@ class ModeleFront extends Modele
 	public function ajouterAssociation($prodId, $prodIdAssocie)
 	{
 		try {
+			// Vérifier si l'association existe déjà dans le sens inverse
+			$reqCheck = "SELECT COUNT(*) FROM associer WHERE (prodId = :prodId AND prodId_produit = :prodIdAssocie) OR (prodId = :prodIdAssocie AND prodId_produit = :prodId)";
+			$stmtCheck = $this->getBdd()->prepare($reqCheck);
+			$stmtCheck->execute([
+				':prodId' => $prodId,
+				':prodIdAssocie' => $prodIdAssocie
+			]);
+			if ($stmtCheck->fetchColumn() > 0) {
+				return false; // L'association existe déjà dans un sens ou dans l'autre
+			}
+
 			$req = 'INSERT INTO associer (prodId, prodId_produit) VALUES (:prodId, :prodIdAssocie)';
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->bindParam(':prodId', $prodId, PDO::PARAM_STR);

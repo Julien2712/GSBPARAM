@@ -6,6 +6,13 @@
         </div>
     </div>
 
+    <?php if (isset($erreur)): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
     <form method="POST" action="index.php?uc=gererProduit&action=modifier&idProduit=<?= urlencode($leProduit->id) ?>"
         id="formEditProduit" class="border p-4 rounded shadow-sm bg-light">
         <div class="row">

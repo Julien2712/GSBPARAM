@@ -1,8 +1,22 @@
 <div class="alert alert-light" role="alert" id="categorie">Gérer les produits :</div>
 
-<?php if (isset($_GET['succes']) && $_GET['succes'] === 'ajout'): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Succès !</strong> Le produit a été créé.
+<?php if (isset($_GET['succes'])): ?>
+    <?php if ($_GET['succes'] === 'ajout'): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Succès !</strong> Le produit a été créé.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php elseif ($_GET['succes'] === 'suppr'): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Succès !</strong> Le produit a été supprimé.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>
+
+<?php if (isset($_GET['erreur']) && $_GET['erreur'] === 'suppr_cmd'): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Erreur !</strong> Ce produit ne peut pas être supprimé car il a déjà été commandé.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <?php endif; ?>

@@ -66,6 +66,25 @@ class ControleurGererProduit
                         break;
                     }
 
+                    // Vérifier si le stock est valide (pas négatif)
+                    if ($stock < 0) {
+                        $erreur = "Le stock ne peut pas être négatif.";
+                        $lesCategories = $this->modeleFront->getLesCategories();
+                        $lesMarques = $this->modeleFront->getLesMarques();
+                        $anciennesValeurs = [
+                            'id' => $id,
+                            'description' => $description,
+                            'prix' => $prix,
+                            'image' => $image,
+                            'idCategorie' => $idCategorie,
+                            'stock' => $stock,
+                            'contenance' => $contenance,
+                            'marqueID' => $marqueID
+                        ];
+                        include("vues/v_produit_ajout.php");
+                        break;
+                    }
+
                     // Vérifier si l'ID existe déjà
                     $produitExistant = $this->modeleFront->getLesInfosProduit($id);
                     if ($produitExistant) {
@@ -103,6 +122,24 @@ class ControleurGererProduit
                     $contenance = isset($_POST['contenance']) ? intval($_POST['contenance']) : null;
                     $marqueID = isset($_POST['marqueID']) ? intval($_POST['marqueID']) : 1;
 
+                    if ($stock < 0) {
+                        $erreur = "Le stock ne peut pas être négatif.";
+                        $leProduit = $this->modeleFront->getLesInfosProduit($idProduit);
+                        // Conserver les valeurs saisies
+                        $leProduit->description = $description;
+                        $leProduit->prix = $prix;
+                        $leProduit->image = $image;
+                        $leProduit->idCategorie = $idCategorie;
+                        $leProduit->stock = $stock;
+                        $leProduit->contenance = $contenance;
+                        $leProduit->marqueID = $marqueID;
+
+                        $lesCategories = $this->modeleFront->getLesCategories();
+                        $lesMarques = $this->modeleFront->getLesMarques();
+                        include("vues/v_produit_edit.php");
+                        break;
+                    }
+
                     if ($idProduit) {
                         $this->modeleFront->modifierProduit($idProduit, $description, $prix, $image, $idCategorie, $stock, $marqueID, $contenance);
                     }
@@ -113,7 +150,12 @@ class ControleurGererProduit
 
             case 'supprimer':
                 if ($idProduit) {
-                    $this->modeleFront->supprimerProduit($idProduit);
+                    if ($this->modeleFront->supprimerProduit($idProduit)) {
+                        echo '<script>window.location.href="index.php?uc=gererProduit&action=afficher&succes=suppr";</script>';
+                    } else {
+                        echo '<script>window.location.href="index.php?uc=gererProduit&action=afficher&erreur=suppr_cmd";</script>';
+                    }
+                    exit;
                 }
                 echo '<script>window.location.href="index.php?uc=gererProduit&action=afficher";</script>';
                 exit;
