@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `lignecommande` (
   PRIMARY KEY (`ligneID`),
   KEY `lignecommande_prodId_FK` (`prodId`),
   KEY `lignecommande_panierID_FK` (`panierID`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `lignecommande`
