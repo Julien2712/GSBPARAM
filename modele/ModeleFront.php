@@ -198,7 +198,7 @@ class ModeleFront extends Modele
 		try {
 			$this->getBdd()->beginTransaction();
 
-			// 1. Get next panierID
+			// 1. Récupération du prochain panierID
 			$reqId = 'SELECT IFNULL(MAX(panierID), 0) + 1 as nextId FROM panier_commande';
 			$resId = $this->getBdd()->query($reqId);
 			$panierID = $resId->fetch()['nextId'];
@@ -209,7 +209,7 @@ class ModeleFront extends Modele
 				$utiId = $_SESSION['utilisateur']->id;
 			}
 
-			// 2. Insert into panier_commande
+			// 2. Insertion dans panier_commande
 			$reqPC = "INSERT INTO panier_commande (panierID, panierDate, dateCommande, etatCommande, utiId) 
 					  VALUES (:id, :pdate, :cdate, 'validée', :utiId)";
 			$stmtPC = $this->getBdd()->prepare($reqPC);
@@ -220,7 +220,7 @@ class ModeleFront extends Modele
 				':utiId' => $utiId
 			]);
 
-			// 3. Insert into lignecommande (with deduplication and quantity count)
+			// 3. Insertion dans lignecommande (avec déduplication et comptage des quantités)
 			$counts = array_count_values($lesIdProduit);
 
 			$reqL = "INSERT INTO lignecommande (ligneID, ligneQuantite, prodId, panierID) 
@@ -228,7 +228,7 @@ class ModeleFront extends Modele
 			$stmtL = $this->getBdd()->prepare($reqL);
 
 			foreach ($counts as $pid => $qte) {
-				// Get next ligneID
+				// Récupération du prochain ligneID
 				$reqIdL = 'SELECT IFNULL(MAX(ligneID), 0) + 1 as nextId FROM lignecommande';
 				$resIdL = $this->getBdd()->query($reqIdL);
 				$ligneID = $resIdL->fetch()['nextId'];
@@ -278,24 +278,20 @@ class ModeleFront extends Modele
 		try {
 			$this->getBdd()->beginTransaction();
 
-			// 1. Get next conId
 			$reqIdCon = 'SELECT IFNULL(MAX(conId), 0) + 1 as nextId FROM connexion';
 			$resIdCon = $this->getBdd()->query($reqIdCon);
 			$conId = $resIdCon->fetch()['nextId'];
 
-			// 2. Insert into connexion
 			$reqCon = 'INSERT INTO connexion (conId, conMdp) VALUES (:conId, :mdp)';
 			$stmtCon = $this->getBdd()->prepare($reqCon);
 			$stmtCon->bindParam(':conId', $conId, PDO::PARAM_INT);
 			$stmtCon->bindParam(':mdp', $hashMdp, PDO::PARAM_STR);
 			$stmtCon->execute();
 
-			// 3. Get next utiId
 			$reqIdUti = 'SELECT IFNULL(MAX(utiId), 0) + 1 as nextId FROM utilisateur';
 			$resIdUti = $this->getBdd()->query($reqIdUti);
 			$utiId = $resIdUti->fetch()['nextId'];
 
-			// 4. Insert into utilisateur (habId = 1 for Client)
 			$completNom = $nom . ' ' . $prenom;
 			$reqUti = 'INSERT INTO utilisateur (utiId, utiLogin, utiNom, utiMail, utiCp, utiVille, utiAdresse, habId, conId) 
 					   VALUES (:utiId, :login, :nom, :mail, :cp, :ville, :adresse, 1, :conId)';
@@ -364,7 +360,7 @@ class ModeleFront extends Modele
 		try {
 			$this->getBdd()->beginTransaction();
 
-			// 1. Find or create 'en_preparation' panier
+			// 1. Recherche d'un panier en cours de préparation pour cet utilisateur
 			$req = "SELECT panierID FROM panier_commande WHERE utiId = :id AND etatCommande = 'en_preparation'";
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute([':id' => $idUser]);
@@ -372,12 +368,13 @@ class ModeleFront extends Modele
 
 			if ($panier) {
 				$panierID = $panier['panierID'];
-				// Delete old lines
+
+				// Suppression des anciennes lignes de commande pour les remplacer
 				$reqDel = "DELETE FROM lignecommande WHERE panierID = :id";
 				$stmtDel = $this->getBdd()->prepare($reqDel);
 				$stmtDel->execute([':id' => $panierID]);
 			} else {
-				// Create new panier
+				// Création d'un nouveau panier s'il n'en existe pas
 				$reqId = 'SELECT IFNULL(MAX(panierID), 0) + 1 as nextId FROM panier_commande';
 				$resId = $this->getBdd()->query($reqId);
 				$panierID = $resId->fetch()['nextId'];
@@ -389,14 +386,15 @@ class ModeleFront extends Modele
 				$stmtIns->execute([':id' => $panierID, ':date' => $date, ':utiId' => $idUser]);
 			}
 
-			// 2. Insert new lines
+			// 2. Insertion des nouvelles lignes de commande (produits du panier)
 			$reqL = "INSERT INTO lignecommande (ligneID, ligneQuantite, prodId, panierID) VALUES (:lid, :qte, :pid, :panId)";
 			$stmtL = $this->getBdd()->prepare($reqL);
 
 			foreach ($panierAssoc as $pid => $qte) {
 				if ($qte <= 0)
 					continue;
-				// Get next ligneID
+
+				// Génération d'un nouvel identifiant pour chaque ligne de commande
 				$reqIdL = 'SELECT IFNULL(MAX(ligneID), 0) + 1 as nextId FROM lignecommande';
 				$resIdL = $this->getBdd()->query($reqIdL);
 				$ligneID = $resIdL->fetch()['nextId'];
@@ -409,9 +407,11 @@ class ModeleFront extends Modele
 				]);
 			}
 
+			// Validation de la transaction
 			$this->getBdd()->commit();
 			return true;
 		} catch (PDOException $e) {
+			// En cas d'erreur, annulation des requêtes pour maintenir l'intégrité
 			$this->getBdd()->rollBack();
 			return false;
 		}
@@ -774,7 +774,7 @@ class ModeleFront extends Modele
 	public function getProduitsMisEnAvant()
 	{
 		try {
-			// Get products currently promoted
+			// Récupération des produits actuellement mis en avant
 			$req = 'SELECT prodId as id, prodDescription as description, prodPrix as prix, prodImage as image ' .
 				'FROM produit ' .
 				'WHERE dateMiseEnAvantDebut <= CURDATE() AND dateMiseEnAvantfin >= CURDATE()';
