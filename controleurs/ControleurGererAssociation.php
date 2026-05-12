@@ -24,9 +24,15 @@ class ControleurGererAssociation
                 $prodId = isset($_POST['prodId']) ? $_POST['prodId'] : '';
                 $prodIdAssocie = isset($_POST['prodIdAssocie']) ? $_POST['prodIdAssocie'] : '';
                 if (!empty($prodId) && !empty($prodIdAssocie) && $prodId !== $prodIdAssocie) {
-                    $this->modeleFront->ajouterAssociation($prodId, $prodIdAssocie);
+                    $succes = $this->modeleFront->ajouterAssociation($prodId, $prodIdAssocie);
+                    if ($succes) {
+                        echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher&succes=ajout";</script>';
+                    } else {
+                        echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher&erreur=ajout_db";</script>';
+                    }
+                } else {
+                    echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher&erreur=invalide";</script>';
                 }
-                echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher";</script>';
                 exit;
                 break;
 
@@ -54,9 +60,15 @@ class ControleurGererAssociation
                 $nouveauProdIdAssocie = isset($_POST['prodIdAssocie']) ? $_POST['prodIdAssocie'] : '';
                 
                 if (!empty($ancienProdId) && !empty($ancienProdIdAssocie) && !empty($nouveauProdId) && !empty($nouveauProdIdAssocie) && $nouveauProdId !== $nouveauProdIdAssocie) {
-                    $this->modeleFront->modifierAssociation($ancienProdId, $ancienProdIdAssocie, $nouveauProdId, $nouveauProdIdAssocie);
+                    $succes = $this->modeleFront->modifierAssociation($ancienProdId, $ancienProdIdAssocie, $nouveauProdId, $nouveauProdIdAssocie);
+                    if ($succes) {
+                        echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher&succes=modif";</script>';
+                    } else {
+                        echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher&erreur=modif_db";</script>';
+                    }
+                } else {
+                    echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher&erreur=invalide";</script>';
                 }
-                echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher";</script>';
                 exit;
                 break;
         }
