@@ -259,7 +259,7 @@ class ModeleFront extends Modele
 	public function getUserByLogin($login)
 	{
 		try {
-			$req = 'SELECT utiId as id, utiLogin as login, conMdp as motdepasse, utiNom as nom, utiMail as mail, habId as habId FROM utilisateur JOIN connexion ON utilisateur.conId = connexion.conId WHERE utiLogin = :login';
+			$req = 'SELECT utiId as id, utiLogin as login, conMdp as motdepasse, utiNom as nom, utiMail as mail, utiAdresse as adresse, utiCp as cp, utiVille as ville, habId as habId FROM utilisateur JOIN connexion ON utilisateur.conId = connexion.conId WHERE utiLogin = :login';
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->bindParam(':login', $login, PDO::PARAM_STR);
 			$stmt->execute();

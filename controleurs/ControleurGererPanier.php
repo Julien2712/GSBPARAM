@@ -197,12 +197,22 @@ class ControleurGererPanier
             include(__DIR__ . '/../vues/v_message.php');
             return;
         }
+
+        // Rafraîchir les infos de la session pour inclure la nouvelle récupération de l'adresse, cp, ville
+        if (!empty($_SESSION['utilisateur']->login)) {
+            $userUpdate = $this->modeleFront->getUserByLogin($_SESSION['utilisateur']->login);
+            if ($userUpdate) {
+                unset($userUpdate->motdepasse);
+                $_SESSION['utilisateur'] = $userUpdate;
+            }
+        }
+
         // pré-remplissage avec les infos de l'utilisateur connecté
         $nom = !empty($_SESSION['utilisateur']->nom) ? htmlspecialchars($_SESSION['utilisateur']->nom, ENT_QUOTES, 'UTF-8') : '';
         $mail = !empty($_SESSION['utilisateur']->mail) ? htmlspecialchars($_SESSION['utilisateur']->mail, ENT_QUOTES, 'UTF-8') : '';
-        $rue = '';
-        $cp = '';
-        $ville = '';
+        $rue = !empty($_SESSION['utilisateur']->adresse) ? htmlspecialchars($_SESSION['utilisateur']->adresse, ENT_QUOTES, 'UTF-8') : '';
+        $cp = !empty($_SESSION['utilisateur']->cp) ? htmlspecialchars($_SESSION['utilisateur']->cp, ENT_QUOTES, 'UTF-8') : '';
+        $ville = !empty($_SESSION['utilisateur']->ville) ? htmlspecialchars($_SESSION['utilisateur']->ville, ENT_QUOTES, 'UTF-8') : '';
         include(__DIR__ . '/../vues/v_commande.php');
     }
 
