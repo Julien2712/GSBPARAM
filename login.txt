@@ -1,0 +1,9 @@
+Admin :
+Login : admin
+Mot de passe : AdminBoss@2026!
+Client 1 :
+Login : client1
+Mot de passe : ClientOne#2026$
+Client 2 :
+Login : client2
+Mot de passe : ClientTwo*2026^
