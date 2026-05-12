@@ -18,7 +18,7 @@
                         <strong class="me-2">État :</strong>
                         <select name="etat" class="form-select form-select-sm w-auto d-inline-block me-2">
                             <?php 
-                            $etats = ['en préparation', 'validée', 'expédiée', 'livrée', 'annulée'];
+                            $etats = ['validée', 'expédiée', 'livrée', 'annulée'];
                             $etatActuel = strtolower($infosCommande->etat ?? '');
                             foreach ($etats as $e) {
                                 $selected = ($e === $etatActuel) ? 'selected' : '';

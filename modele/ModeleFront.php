@@ -341,7 +341,7 @@ class ModeleFront extends Modele
 			$req = "SELECT prodId, ligneQuantite 
 					FROM panier_commande 
 					JOIN lignecommande ON panier_commande.panierID = lignecommande.panierID 
-					WHERE utiId = :id AND etatCommande = 'en_cours'";
+					WHERE utiId = :id AND etatCommande = 'en_preparation'";
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->bindParam(':id', $idUser, PDO::PARAM_INT);
 			$stmt->execute();
@@ -364,8 +364,8 @@ class ModeleFront extends Modele
 		try {
 			$this->getBdd()->beginTransaction();
 
-			// 1. Find or create 'en_cours' panier
-			$req = "SELECT panierID FROM panier_commande WHERE utiId = :id AND etatCommande = 'en_cours'";
+			// 1. Find or create 'en_preparation' panier
+			$req = "SELECT panierID FROM panier_commande WHERE utiId = :id AND etatCommande = 'en_preparation'";
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute([':id' => $idUser]);
 			$panier = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -384,7 +384,7 @@ class ModeleFront extends Modele
 
 				$date = date('Y-m-d');
 				$reqIns = "INSERT INTO panier_commande (panierID, panierDate, dateCommande, etatCommande, utiId) 
-						   VALUES (:id, :date, :date, 'en_cours', :utiId)";
+						   VALUES (:id, :date, :date, 'en_preparation', :utiId)";
 				$stmtIns = $this->getBdd()->prepare($reqIns);
 				$stmtIns->execute([':id' => $panierID, ':date' => $date, ':utiId' => $idUser]);
 			}
@@ -864,7 +864,7 @@ class ModeleFront extends Modele
 	public function getLesCommandes()
 	{
 		try {
-			$req = "SELECT panierID as id, panierDate as date, etatCommande as etat, utiId as utilisateurId FROM panier_commande WHERE etatCommande != 'en_cours' ORDER BY panierDate DESC";
+			$req = "SELECT panierID as id, panierDate as date, etatCommande as etat, utiId as utilisateurId FROM panier_commande WHERE etatCommande != 'en_preparation' ORDER BY panierDate DESC";
 			$res = $this->executerRequete($req);
 			return $res->fetchAll(PDO::FETCH_OBJ);
 		} catch (PDOException $e) {
