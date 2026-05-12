@@ -43,7 +43,7 @@ class ControleurGererCommande
                     $idCommande = $_POST['idCommande'];
                     $etat = $_POST['etat'];
                     $this->modeleFront->changerEtatCommande($idCommande, $etat);
-                    echo '<script>window.location.href="index.php?uc=gererCommande&action=afficherDetails&id=' . urlencode($idCommande) . '";</script>';
+                    echo '<script>window.location.href="index.php?uc=gererCommande&action=afficherDetails&id=' . urlencode($idCommande) . '&succes=etat";</script>';
                 } else {
                     echo '<script>window.location.href="index.php?uc=gererCommande&action=afficher";</script>';
                 }

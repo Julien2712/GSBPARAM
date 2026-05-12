@@ -6,6 +6,13 @@
 </div>
 
 <div class="col-10 m-auto mb-4">
+    <?php if (isset($_GET['succes']) && $_GET['succes'] === 'etat'): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Succès !</strong> L'état de la commande a été mis à jour avec succès.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
     <?php if (isset($infosCommande) && $infosCommande): ?>
     <div class="row mb-4">
         <div class="col-md-6">
