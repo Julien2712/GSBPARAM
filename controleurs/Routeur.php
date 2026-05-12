@@ -184,6 +184,10 @@ class Routeur
                         $this->ctrlUtilisateur->afficherEspaceClient();
                         break;
                     }
+                    case 'modifierInfos': {
+                        $this->ctrlUtilisateur->modifierInfos();
+                        break;
+                    }
                     default: {
                         $this->ctrlUtilisateur->afficherConnexion();
                         break;

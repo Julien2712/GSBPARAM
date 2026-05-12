@@ -136,8 +136,54 @@ class ControleurUtilisateur
         }
 
         $utiId = $_SESSION['utilisateur']->id;
-        $lesAvis = $this->modeleFront->getAvisUtilisateur($utiId);
+        $onglet = $_GET['onglet'] ?? 'infos';
+        
+        $lesAvis = [];
+        $lesCommandes = [];
+        
+        if ($onglet === 'avis') {
+            $lesAvis = $this->modeleFront->getAvisUtilisateur($utiId);
+        } elseif ($onglet === 'commandes') {
+            $lesCommandes = $this->modeleFront->getCommandesUtilisateur($utiId);
+        }
 
+        include __DIR__ . '/../vues/v_espaceClient.php';
+    }
+
+    public function modifierInfos()
+    {
+        if (!isset($_SESSION['utilisateur'])) {
+            echo '<script>window.location.href="index.php?uc=utilisateur&action=connexion";</script>';
+            exit;
+        }
+
+        $utiId = $_SESSION['utilisateur']->id;
+        $nom = trim($_POST['nom'] ?? '');
+        $prenom = trim($_POST['prenom'] ?? '');
+        $rue = trim($_POST['rue'] ?? '');
+        $cp = trim($_POST['cp'] ?? '');
+        $ville = trim($_POST['ville'] ?? '');
+        $mail = trim($_POST['mail'] ?? '');
+        
+        $msgErreurs = [];
+        if ($nom === '' || $prenom === '' || $rue === '' || $cp === '' || $ville === '' || $mail === '') {
+            $msgErreurs[] = "Tous les champs (nom, prénom, adresse, code postal, ville, mail) sont obligatoires.";
+        }
+
+        $onglet = 'infos';
+        if (!empty($msgErreurs)) {
+            include __DIR__ . '/../vues/v_espaceClient.php';
+            return;
+        }
+
+        $this->modeleFront->modifierUtilisateur($utiId, $nom, $prenom, $rue, $cp, $ville, $mail);
+        
+        // Update session
+        $user = $this->modeleFront->getUserByLogin($_SESSION['utilisateur']->login);
+        unset($user->motdepasse);
+        $_SESSION['utilisateur'] = $user;
+        
+        $msgSucces = "Vos informations ont été mises à jour avec succès.";
         include __DIR__ . '/../vues/v_espaceClient.php';
     }
 }

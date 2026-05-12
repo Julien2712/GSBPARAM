@@ -916,6 +916,38 @@ class ModeleFront extends Modele
 		}
 	}
 
+	public function modifierUtilisateur($utiId, $nom, $prenom, $rue, $cp, $ville, $mail)
+	{
+		try {
+			$completNom = $nom . ' ' . $prenom;
+			$req = 'UPDATE utilisateur SET utiNom = :nom, utiMail = :mail, utiCp = :cp, utiVille = :ville, utiAdresse = :adresse WHERE utiId = :utiId';
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([
+				':nom' => $completNom,
+				':mail' => $mail,
+				':cp' => $cp,
+				':ville' => $ville,
+				':adresse' => $rue,
+				':utiId' => $utiId
+			]);
+			return true;
+		} catch (PDOException $e) {
+			print "Erreur !: " . $e->getMessage();
+			die();
+		}
+	}
+
+	public function getCommandesUtilisateur($utiId)
+	{
+		try {
+			$req = "SELECT panierID as id, panierDate as date, etatCommande as etat FROM panier_commande WHERE utiId = :utiId AND etatCommande != 'en_preparation' ORDER BY panierDate DESC";
+			$stmt = $this->getBdd()->prepare($req);
+			$stmt->execute([':utiId' => $utiId]);
+			return $stmt->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			return [];
+		}
+	}
 }
 
 // Vérifie si un utilisateur est connecté
