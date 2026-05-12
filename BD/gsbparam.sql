@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `associer` (
   `prodId_produit` varchar(5) NOT NULL,
   PRIMARY KEY (`prodId`,`prodId_produit`),
   KEY `associer_prodId_produit_FK` (`prodId_produit`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `avis` (
   `description` varchar(255) NOT NULL,
   PRIMARY KEY (`utiId`,`prodId`),
   KEY `avis_prodId_FK` (`prodId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `categorie` (
   `id` char(3) NOT NULL,
   `libelle` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `categorie`
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `connexion` (
   `conId` int(11) NOT NULL,
   `conMdp` varchar(255) NOT NULL,
   PRIMARY KEY (`conId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `connexion`
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `habilitation` (
   `habId` int(11) NOT NULL,
   `habLibelle` varchar(255) NOT NULL,
   PRIMARY KEY (`habId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `habilitation`
@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS `marque` (
   `marqueID` int(11) NOT NULL,
   `marqueLibelle` varchar(3) NOT NULL,
   PRIMARY KEY (`marqueID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `marque`
@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS `panier_commande` (
   `utiId` int(11) DEFAULT NULL,
   PRIMARY KEY (`panierID`),
   KEY `panier_commande_utiId_FK` (`utiId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `panier_commande`
@@ -231,7 +231,7 @@ CREATE TABLE IF NOT EXISTS `produit` (
   PRIMARY KEY (`prodId`),
   KEY `produit_idCategorie_FK` (`idCategorie`),
   KEY `produit_marqueID_FK` (`marqueID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `produit`
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   UNIQUE KEY `utiLogin_UNQ` (`utiLogin`),
   UNIQUE KEY `conId_UNQ` (`conId`),
   KEY `utilisateur_habId_FK` (`habId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `utilisateur`
