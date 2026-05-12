@@ -89,7 +89,7 @@ class ControleurGererProduit
                     }
                     $this->modeleFront->creerProduit($id, $description, $prix, $image, $idCategorie, $stock, $marqueID, $contenance);
                 }
-                echo '<script>window.location.href="index.php?uc=gererProduit&action=afficher";</script>';
+                echo '<script>window.location.href="index.php?uc=gererProduit&action=afficher&succes=ajout";</script>';
                 exit;
                 break;
 

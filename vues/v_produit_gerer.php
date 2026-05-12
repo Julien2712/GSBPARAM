@@ -1,5 +1,12 @@
 <div class="alert alert-light" role="alert" id="categorie">Gérer les produits :</div>
 
+<?php if (isset($_GET['succes']) && $_GET['succes'] === 'ajout'): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Succès !</strong> Le produit a été créé.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
 <div class="mb-3 contenuCentre">
     <a href="index.php?uc=gererProduit&action=afficherAjouter" class="btn btn-primary shadow-sm">
         <i class="bi bi-plus-circle"></i> Ajouter un produit
