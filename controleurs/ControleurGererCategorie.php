@@ -40,7 +40,8 @@ class ControleurGererCategorie
                 $id = isset($_POST['id']) ? $_POST['id'] : '';
                 $libelle = isset($_POST['libelle']) ? $_POST['libelle'] : '';
                 $this->modeleFront->creerCategorie($id, $libelle);
-                header("Location: index.php?uc=gererCategorie&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererCategorie&action=afficher";</script>';
+                exit;
                 break;
 
             case 'modifier':
@@ -49,12 +50,14 @@ class ControleurGererCategorie
                     $nouvelId = isset($_POST['id']) ? $_POST['id'] : $idCategorie;
                     $this->modeleFront->modifierCategorie($idCategorie, $nouvelId, $libelle);
                 }
-                header("Location: index.php?uc=gererCategorie&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererCategorie&action=afficher";</script>';
+                exit;
                 break;
 
             case 'supprimer':
                 $this->modeleFront->supprimerCategorie($idCategorie);
-                header("Location: index.php?uc=gererCategorie&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererCategorie&action=afficher";</script>';
+                exit;
                 break;
 
             case 'changerCategorieProduit':
@@ -63,7 +66,8 @@ class ControleurGererCategorie
                 if ($idProduit && $nouvelleCategorie) {
                     $this->modeleFront->changerCategorieProduit($idProduit, $nouvelleCategorie);
                 }
-                header("Location: index.php?uc=gererCategorie&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererCategorie&action=afficher";</script>';
+                exit;
                 break;
         }
     }

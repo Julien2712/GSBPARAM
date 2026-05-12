@@ -131,7 +131,7 @@ class ControleurUtilisateur
     public function afficherEspaceClient()
     {
         if (!isset($_SESSION['utilisateur'])) {
-            header('Location: index.php?uc=utilisateur&action=connexion');
+            echo '<script>window.location.href="index.php?uc=utilisateur&action=connexion";</script>';
             exit;
         }
 

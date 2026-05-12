@@ -26,7 +26,7 @@ class ControleurGererCommande
                     $lesDetails = $this->modeleFront->getDetailsCommande($idCommande);
                     include("vues/v_gererCommandeDetails.php");
                 } else {
-                    header("Location: index.php?uc=gererCommande&action=afficher");
+                    echo '<script>window.location.href="index.php?uc=gererCommande&action=afficher";</script>';
                     exit;
                 }
                 break;

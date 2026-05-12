@@ -26,7 +26,8 @@ class ControleurGererAssociation
                 if (!empty($prodId) && !empty($prodIdAssocie) && $prodId !== $prodIdAssocie) {
                     $this->modeleFront->ajouterAssociation($prodId, $prodIdAssocie);
                 }
-                header("Location: index.php?uc=gererAssociation&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher";</script>';
+                exit;
                 break;
 
             case 'supprimer':
@@ -35,7 +36,8 @@ class ControleurGererAssociation
                 if (!empty($prodId) && !empty($prodIdAssocie)) {
                     $this->modeleFront->supprimerAssociation($prodId, $prodIdAssocie);
                 }
-                header("Location: index.php?uc=gererAssociation&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher";</script>';
+                exit;
                 break;
 
             case 'afficherModifier':
@@ -54,7 +56,8 @@ class ControleurGererAssociation
                 if (!empty($ancienProdId) && !empty($ancienProdIdAssocie) && !empty($nouveauProdId) && !empty($nouveauProdIdAssocie) && $nouveauProdId !== $nouveauProdIdAssocie) {
                     $this->modeleFront->modifierAssociation($ancienProdId, $ancienProdIdAssocie, $nouveauProdId, $nouveauProdIdAssocie);
                 }
-                header("Location: index.php?uc=gererAssociation&action=afficher");
+                echo '<script>window.location.href="index.php?uc=gererAssociation&action=afficher";</script>';
+                exit;
                 break;
         }
     }

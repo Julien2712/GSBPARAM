@@ -129,7 +129,7 @@ class ControleurVoirProduits{
     public function donnerAvis($idProduit) {
         if (!isset($_SESSION['utilisateur'])) {
             // Rediriger vers connexion si non connecté
-            header('Location: index.php?uc=utilisateur&action=connexion');
+            echo '<script>window.location.href="index.php?uc=utilisateur&action=connexion";</script>';
             exit;
         }
 
@@ -140,7 +140,7 @@ class ControleurVoirProduits{
             
             if ($aDejaDonneAvis) {
                 // S'il a déjà donné son avis, le rediriger avec erreur ou l'afficher sur le detail du produit
-                header('Location: index.php?uc=voirProduits&produit=' . $idProduit . '&action=voirDetails&dejaAvis=1');
+                echo '<script>window.location.href="index.php?uc=voirProduits&produit=' . $idProduit . '&action=voirDetails&dejaAvis=1";</script>';
                 exit;
             }
 
@@ -160,7 +160,7 @@ class ControleurVoirProduits{
      */
     public function validerAvis($idProduit, $donnees) {
         if (!isset($_SESSION['utilisateur'])) {
-            header('Location: index.php?uc=utilisateur&action=connexion');
+            echo '<script>window.location.href="index.php?uc=utilisateur&action=connexion";</script>';
             exit;
         }
 
@@ -178,7 +178,7 @@ class ControleurVoirProduits{
             if (!$this->modeleFront->aDejaDonneAvis($utiId, $idProduit)) {
                 $succes = $this->modeleFront->ajouterAvis($utiId, $idProduit, $note, $commentaire);
                 if ($succes) {
-                    header('Location: index.php?uc=voirProduits&produit=' . $idProduit . '&action=voirDetails&avisAjoute=1');
+                    echo '<script>window.location.href="index.php?uc=voirProduits&produit=' . $idProduit . '&action=voirDetails&avisAjoute=1";</script>';
                     exit;
                 } else {
                     $msgErreurs[] = "Une erreur est survenue lors de l'enregistrement de l'avis.";

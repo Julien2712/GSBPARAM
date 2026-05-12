@@ -15,7 +15,7 @@ class ControleurMiseEnAvant{
     public function gerer() {
         if (!isset($_SESSION['utilisateur']) || $_SESSION['utilisateur']->habId != 2) {
             // Seulement l'administrateur
-            header('Location: index.php?uc=accueil');
+            echo '<script>window.location.href="index.php?uc=accueil";</script>';
             exit;
         }
 
