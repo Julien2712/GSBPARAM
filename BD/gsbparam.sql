@@ -1,31 +1,18 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Hôte : 127.0.0.1:3307
--- Généré le : mer. 01 avr. 2026 à 12:58
--- Version du serveur : 11.5.2-MariaDB
--- Version de PHP : 8.3.14
+-- Collation corrigée : utf8mb4_uca1400_ai_ci → utf8mb3_bin
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de données : `test`
---
+/*!40101 SET NAMES utf8mb3 */;
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `associer`
---
+-- Table `associer`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `associer`;
 CREATE TABLE IF NOT EXISTS `associer` (
@@ -33,13 +20,15 @@ CREATE TABLE IF NOT EXISTS `associer` (
   `prodId_produit` varchar(5) NOT NULL,
   PRIMARY KEY (`prodId`,`prodId_produit`),
   KEY `associer_prodId_produit_FK` (`prodId_produit`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+INSERT INTO `associer` (`prodId`, `prodId_produit`) VALUES
+('c01', 'c02'),
+('c01', 'f06');
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `avis`
---
+-- Table `avis`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `avis`;
 CREATE TABLE IF NOT EXISTS `avis` (
@@ -50,24 +39,23 @@ CREATE TABLE IF NOT EXISTS `avis` (
   `description` varchar(255) NOT NULL,
   PRIMARY KEY (`utiId`,`prodId`),
   KEY `avis_prodId_FK` (`prodId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+INSERT INTO `avis` (`utiId`, `prodId`, `note`, `date`, `description`) VALUES
+(1, 'c01', 5, '2026-05-12', 'ezae'),
+(1, 'c02', 5, '2026-05-12', 'test'),
+(1, 'c10', 5, '2026-04-28', 'bien');
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `categorie`
---
+-- Table `categorie`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `categorie`;
 CREATE TABLE IF NOT EXISTS `categorie` (
   `id` char(3) NOT NULL,
   `libelle` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `categorie`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 INSERT INTO `categorie` (`id`, `libelle`) VALUES
 ('CH', 'Cheveux'),
@@ -75,145 +63,105 @@ INSERT INTO `categorie` (`id`, `libelle`) VALUES
 ('PS', 'Protection Solaire');
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `connexion`
---
+-- Table `connexion`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `connexion`;
 CREATE TABLE IF NOT EXISTS `connexion` (
   `conId` int(11) NOT NULL,
   `conMdp` varchar(255) NOT NULL,
   PRIMARY KEY (`conId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `connexion`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 INSERT INTO `connexion` (`conId`, `conMdp`) VALUES
 (1, '$2y$10$pNNmjNFFDE8kwYFaXSDrluH55Kswjel.ZokS7YHn3f/W/slloFzWm'),
-(2, 'TheBest$147#'),
-(3, 'NearlyTheBest$280@');
+(4, '$2y$10$3nidkX7NTwzegV71XmTQ3uR7Qs4akjsJKGwnMNGFb2vaGvfmWOiWK'),
+(5, '$2y$10$ciHEIFPU/PPwoTBfD1LGMeTn7Yt.F2lugZ223wCtcqPaPWIqCxeCG'),
+(6, '$2y$10$DbDFTN4PKKd6j3zJvT.b8u45f/yeOYKeQtbXlzHg.LCAGEkix5Wkm'),
+(7, '$2y$10$GxmFpYEFTEZ06nknaxX7nONnFxndtsZUBaSFBGc2zmF6Mopfp3ETu'),
+(8, '$2y$10$WLYEIELjHj19eVjgApRGteJA18oAIDBxyI3/CUnQG.sxPV94dXm3C');
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `habilitation`
---
+-- Table `habilitation`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `habilitation`;
 CREATE TABLE IF NOT EXISTS `habilitation` (
   `habId` int(11) NOT NULL,
   `habLibelle` varchar(255) NOT NULL,
   PRIMARY KEY (`habId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `habilitation`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 INSERT INTO `habilitation` (`habId`, `habLibelle`) VALUES
 (1, 'Client'),
 (2, 'Administrateur');
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `lignecommande`
---
+-- Table `lignecommande`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `lignecommande`;
 CREATE TABLE IF NOT EXISTS `lignecommande` (
-  `ligneID` int(11) NOT NULL AUTO_INCREMENT,
+  `ligneID` int(11) NOT NULL,
   `ligneQuantite` int(11) NOT NULL,
   `prodId` varchar(5) NOT NULL,
-  `panierID` bigint(20) NOT NULL,
+  `panierID` int(11) NOT NULL,
   PRIMARY KEY (`ligneID`),
   KEY `lignecommande_prodId_FK` (`prodId`),
   KEY `lignecommande_panierID_FK` (`panierID`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `lignecommande`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 INSERT INTO `lignecommande` (`ligneID`, `ligneQuantite`, `prodId`, `panierID`) VALUES
-(1, 1, 'f03', 1101461660),
-(2, 1, 'p01', 1101461660),
-(3, 1, 'f05', 1101461665),
-(4, 1, 'p06', 1101461665),
-(5, 1, 'c02', 1101461666),
-(6, 1, 'c04', 1101461666),
-(7, 1, 'c03', 1101461669),
-(8, 1, 'c04', 1101461669),
-(9, 1, 'c03', 1101461670),
-(10, 1, 'c04', 1101461670),
-(11, 1, 'c02', 1101461671),
-(12, 1, 'c02', 1101461673),
-(13, 1, 'c03', 1101461673),
-(14, 1, 'c02', 1101461674),
-(15, 1, 'c03', 1101461674);
+(2, 1, 'c02', 4),
+(6, 1, 'c02', 5),
+(7, 1, 'c07', 5),
+(10, 1, 'c02', 6),
+(11, 1, 'f03', 6),
+(13, 2, 'c02', 7),
+(14, 1, 'c01', 3);
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `marque`
---
+-- Table `marque`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `marque`;
 CREATE TABLE IF NOT EXISTS `marque` (
   `marqueID` int(11) NOT NULL,
-  `marqueLibelle` varchar(3) NOT NULL,
+  `marqueLibelle` varchar(20) NOT NULL,
   PRIMARY KEY (`marqueID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `marque`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 INSERT INTO `marque` (`marqueID`, `marqueLibelle`) VALUES
-(1, 'GEN');
+(1, 'GEN'),
+(2, 'AVENE');
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `panier_commande`
---
+-- Table `panier_commande`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `panier_commande`;
 CREATE TABLE IF NOT EXISTS `panier_commande` (
-  `panierID` bigint(20) NOT NULL,
+  `panierID` int(11) NOT NULL,
   `panierDate` date NOT NULL,
   `dateCommande` date NOT NULL,
   `etatCommande` varchar(255) NOT NULL,
   `utiId` int(11) DEFAULT NULL,
   PRIMARY KEY (`panierID`),
   KEY `panier_commande_utiId_FK` (`utiId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `panier_commande`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 INSERT INTO `panier_commande` (`panierID`, `panierDate`, `dateCommande`, `etatCommande`, `utiId`) VALUES
-(1101461660, '2024-09-01', '2024-09-01', 'validée', NULL),
-(1101461665, '2024-09-01', '2024-09-01', 'validée', NULL),
-(1101461666, '2025-10-02', '2025-10-02', 'validée', NULL),
-(1101461667, '2025-10-09', '2025-10-09', 'validée', NULL),
-(1101461668, '2025-10-09', '2025-10-09', 'validée', NULL),
-(1101461669, '2025-10-09', '2025-10-09', 'validée', NULL),
-(1101461670, '2025-10-09', '2025-10-09', 'validée', NULL),
-(1101461671, '2025-10-09', '2025-10-09', 'validée', NULL),
-(1101461672, '2025-10-09', '2025-10-09', 'validée', NULL),
-(1101461673, '2025-10-09', '2025-10-09', 'validée', NULL),
-(1101461674, '2025-10-09', '2025-10-09', 'validée', NULL);
+(1, '2026-05-12', '2026-05-12', 'en_preparation', 7),
+(2, '2026-05-12', '2026-05-12', 'en_preparation', 8),
+(3, '2026-05-12', '2026-05-12', 'en_preparation', 6),
+(4, '2026-05-12', '2026-05-12', 'validée', 6),
+(5, '2026-05-12', '2026-05-12', 'validée', 7),
+(6, '2026-05-12', '2026-05-12', 'validée', 8),
+(7, '2026-05-12', '2026-05-12', 'validée', 6);
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `produit`
---
+-- Table `produit`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `produit`;
 CREATE TABLE IF NOT EXISTS `produit` (
@@ -231,24 +179,20 @@ CREATE TABLE IF NOT EXISTS `produit` (
   PRIMARY KEY (`prodId`),
   KEY `produit_idCategorie_FK` (`idCategorie`),
   KEY `produit_marqueID_FK` (`marqueID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `produit`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 INSERT INTO `produit` (`prodId`, `prodDescription`, `prodPrix`, `prodImage`, `prodDateAjout`, `prodStock`, `prodContenance`, `dateMiseEnAvantDebut`, `dateMiseEnAvantfin`, `idCategorie`, `marqueID`) VALUES
-('c01', 'Laino Shampooing Douche Thé Vert BIO', 4.00, 'assets/images/laino-shampooing-douche-au-the-vert-bio-200ml.png', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
+('c01', 'Laino Shampooing Douche Thé Vert BIO', 4.00, 'assets/images/laino-shampooing-douche-au-the-vert-bio-200ml.png', '2026-04-01', 7, 10, '2026-05-05', '2026-05-25', 'CH', 1),
 ('c02', 'Klorane fibres de lin baume shampooing', 10.80, 'assets/images/klorane-fibres-de-lin-baume-apres-shampooing-150-ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
 ('c03', 'Weleda Kids 2in1 Orange fruitée', 4.00, 'assets/images/weleda-kids-2in1-shower-shampoo-orange-fruitee-150-ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
-('c04', 'Weleda Kids 2in1 vanille douce', 4.00, 'assets/images/weleda-kids-2in1-shower-shampoo-vanille-douce-150-ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
+('c04', 'Weleda Kids 2in1 vanille douce', 4.00, 'assets/images/weleda-kids-2in1-shower-shampoo-vanille-douce-150-ml.jpg', '2026-04-01', 3, 0, NULL, NULL, 'CH', 1),
 ('c05', 'Klorane Shampooing sec ortie', 6.10, 'assets/images/klorane-shampooing-sec-a-l-extrait-d-ortie-spray-150ml.png', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
 ('c06', 'Phytopulp mousse volume intense', 18.00, 'assets/images/phytopulp-mousse-volume-intense-200ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
 ('c07', 'Bio Beaute by Nuxe Shampooing nutritif', 8.00, 'assets/images/bio-beaute-by-nuxe-shampooing-nutritif-200ml.png', '2026-04-01', 0, 0, NULL, NULL, 'CH', 1),
-('c08', 'TEST', 100.00, NULL, '2026-04-01', 0, 0, NULL, NULL, NULL, 1),
+('c10', '5645654', 456.00, '5464', '2026-04-07', 455, 0, NULL, NULL, 'FO', 1),
 ('f01', 'Nuxe Men Contour des Yeux', 12.05, 'assets/images/nuxe-men-contour-des-yeux-multi-fonctions-15ml.png', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
 ('f02', 'Tisane romon nature sommirel bio', 5.50, 'assets/images/tisane-romon-nature-sommirel-bio-sachet-20.jpg', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
-('f03', 'La Roche Posay Cicaplast crème', 11.00, 'assets/images/la-roche-posay-cicaplast-creme-pansement-40ml.jpg', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
+('f03', 'La Roche Posay Cicaplast crème', 11.00, 'assets/images/la-roche-posay-cicaplast-creme-pansement-40ml.jpg', '2026-04-01', 49, 0, NULL, NULL, 'FO', 1),
 ('f04', 'Futuro sport stabilisateur cheville', 26.50, 'assets/images/futuro-sport-stabilisateur-pour-cheville-deluxe-attelle-cheville.png', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
 ('f05', 'Microlife pèse-personne électronique', 63.00, 'assets/images/microlife-pese-personne-electronique-weegschaal-ws80.jpg', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
 ('f06', 'Melapi Miel Thym Liquide 500g', 6.50, 'assets/images/melapi-miel-thym-liquide-500g.jpg', '2026-04-01', 0, 0, NULL, NULL, 'FO', 1),
@@ -262,10 +206,8 @@ INSERT INTO `produit` (`prodId`, `prodDescription`, `prodPrix`, `prodImage`, `pr
 ('p07', 'Bioderma Cicabio creme SPF50+', 13.70, 'assets/images/bioderma-cicabio-creme-spf50-30ml.png', '2026-04-01', 0, 0, NULL, NULL, 'PS', 1);
 
 -- --------------------------------------------------------
-
---
--- Structure de la table `utilisateur`
---
+-- Table `utilisateur`
+-- --------------------------------------------------------
 
 DROP TABLE IF EXISTS `utilisateur`;
 CREATE TABLE IF NOT EXISTS `utilisateur` (
@@ -282,61 +224,41 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   UNIQUE KEY `utiLogin_UNQ` (`utiLogin`),
   UNIQUE KEY `conId_UNQ` (`conId`),
   KEY `utilisateur_habId_FK` (`habId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `utilisateur`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 INSERT INTO `utilisateur` (`utiId`, `utiLogin`, `utiNom`, `utiMail`, `utiCp`, `utiVille`, `utiAdresse`, `habId`, `conId`) VALUES
 (1, 'test', 'test', 'test@gmail.com', '45000', 'test', 'test', 1, 1),
-(2, 'LeBoss', 'LeBoss', NULL, NULL, NULL, NULL, 2, 2),
-(3, 'LeChefProjet', 'LeChefProjet', NULL, NULL, NULL, NULL, 2, 3);
+(6, 'admin', 'admin admin', 'admin@admin.com', '45000', 'ORLEANS', 'adminrue', 2, 6),
+(7, 'client1', 'client1 client1', 'client1@client1.com', '45000', 'ORLEANS', 'client1rue', 1, 7),
+(8, 'client2', 'client2 client2', 'client2@client2.com', '45000', 'ORLEANS', 'client2rue', 1, 8);
 
---
--- Contraintes pour les tables déchargées
---
+-- --------------------------------------------------------
+-- Contraintes (Foreign Keys)
+-- --------------------------------------------------------
 
---
--- Contraintes pour la table `associer`
---
 ALTER TABLE `associer`
   ADD CONSTRAINT `associer_prodId_FK` FOREIGN KEY (`prodId`) REFERENCES `produit` (`prodId`),
   ADD CONSTRAINT `associer_prodId_produit_FK` FOREIGN KEY (`prodId_produit`) REFERENCES `produit` (`prodId`);
 
---
--- Contraintes pour la table `avis`
---
 ALTER TABLE `avis`
   ADD CONSTRAINT `avis_prodId_FK` FOREIGN KEY (`prodId`) REFERENCES `produit` (`prodId`),
   ADD CONSTRAINT `avis_utiId_FK` FOREIGN KEY (`utiId`) REFERENCES `utilisateur` (`utiId`);
 
---
--- Contraintes pour la table `lignecommande`
---
 ALTER TABLE `lignecommande`
   ADD CONSTRAINT `lignecommande_panierID_FK` FOREIGN KEY (`panierID`) REFERENCES `panier_commande` (`panierID`),
   ADD CONSTRAINT `lignecommande_prodId_FK` FOREIGN KEY (`prodId`) REFERENCES `produit` (`prodId`);
 
---
--- Contraintes pour la table `panier_commande`
---
 ALTER TABLE `panier_commande`
   ADD CONSTRAINT `panier_commande_utiId_FK` FOREIGN KEY (`utiId`) REFERENCES `utilisateur` (`utiId`);
 
---
--- Contraintes pour la table `produit`
---
 ALTER TABLE `produit`
   ADD CONSTRAINT `produit_idCategorie_FK` FOREIGN KEY (`idCategorie`) REFERENCES `categorie` (`id`),
   ADD CONSTRAINT `produit_marqueID_FK` FOREIGN KEY (`marqueID`) REFERENCES `marque` (`marqueID`);
 
---
--- Contraintes pour la table `utilisateur`
---
 ALTER TABLE `utilisateur`
   ADD CONSTRAINT `utilisateur_conId_FK` FOREIGN KEY (`conId`) REFERENCES `connexion` (`conId`),
   ADD CONSTRAINT `utilisateur_habId_FK` FOREIGN KEY (`habId`) REFERENCES `habilitation` (`habId`);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
