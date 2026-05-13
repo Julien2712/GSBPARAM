@@ -11,6 +11,11 @@ class ControleurGererAssociation
 
     public function gererAssociation()
     {
+        if (!estAdmin()) {
+            echo '<script>window.location.href="index.php?uc=accueil";</script>';
+            exit;
+        }
+
         $action = isset($_GET['action']) ? $_GET['action'] : 'afficher';
 
         switch ($action) {

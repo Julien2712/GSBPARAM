@@ -13,6 +13,11 @@ class ControleurGererProduit
 
     public function gererProduit()
     {
+        if (!estAdmin()) {
+            echo '<script>window.location.href="index.php?uc=accueil";</script>';
+            exit;
+        }
+
         $action = isset($_GET['action']) ? $_GET['action'] : 'afficher';
         $idProduit = isset($_GET['idProduit']) ? $_GET['idProduit'] : null;
 

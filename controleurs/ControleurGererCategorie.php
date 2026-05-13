@@ -11,6 +11,11 @@ class ControleurGererCategorie
 
     public function gererCategorie()
     {
+        if (!estAdmin()) {
+            echo '<script>window.location.href="index.php?uc=accueil";</script>';
+            exit;
+        }
+
         $action = isset($_GET['action']) ? $_GET['action'] : 'afficher';
         $idCategorie = isset($_GET['idCategorie']) ? $_GET['idCategorie'] : null;
 
