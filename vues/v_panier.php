@@ -38,7 +38,10 @@
                             <input type="hidden" name="produit" value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>">
                             <label for="quantite_<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>" style="color: #555;">Quantité: </label>
                             <select name="quantite" id="quantite_<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>" onchange="this.form.submit()" style="padding: 2px; border: 1px solid #ccc; border-radius: 3px;">
-                                <?php for($i = 1; $i <= 10; $i++): ?>
+                                <?php 
+                                $maxStock = isset($unProduit->stock) ? min((int)$unProduit->stock, 10) : 10;
+                                for($i = 1; $i <= $maxStock; $i++): 
+                                ?>
                                     <option value="<?= $i ?>" <?= $i == $quantite ? 'selected' : '' ?>><?= $i ?></option>
                                 <?php endfor; ?>
                             </select>
