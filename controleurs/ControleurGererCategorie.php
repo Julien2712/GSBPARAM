@@ -60,8 +60,12 @@ class ControleurGererCategorie
                 break;
 
             case 'supprimer':
-                $this->modeleFront->supprimerCategorie($idCategorie);
-                echo '<script>window.location.href="index.php?uc=gererCategorie&action=afficher";</script>';
+                $resultat = $this->modeleFront->supprimerCategorie($idCategorie);
+                if ($resultat) {
+                    echo '<script>window.location.href="index.php?uc=gererCategorie&action=afficher&succes=suppr";</script>';
+                } else {
+                    echo '<script>window.location.href="index.php?uc=gererCategorie&action=afficher&erreur=non_vide";</script>';
+                }
                 exit;
                 break;
 

@@ -97,6 +97,10 @@ class ControleurUtilisateur
         if ($this->modeleFront->getUserByLogin($login))
             $msgErreurs[] = 'Login déjà utilisé.';
 
+        if ($cp !== '' && !preg_match('/^\d{5}$/', $cp)) {
+            $msgErreurs[] = 'Le code postal doit contenir exactement 5 chiffres.';
+        }
+
         if (!empty($msgErreurs)) {
             include __DIR__ . '/../vues/v_inscription.php';
             return;

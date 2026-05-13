@@ -21,11 +21,38 @@
     </div>
 <?php endif; ?>
 
-<div class="mb-3 contenuCentre">
+<div class="mb-3 contenuCentre d-flex justify-content-center gap-2">
     <a href="index.php?uc=gererProduit&action=afficherAjouter" class="btn btn-primary shadow-sm">
         <i class="bi bi-plus-circle"></i> Ajouter un produit
     </a>
+    <?php if (isset($_GET['filtre']) && $_GET['filtre'] === 'stock_critique'): ?>
+        <a href="index.php?uc=gererProduit&action=afficher" class="btn btn-outline-secondary shadow-sm">
+            <i class="bi bi-x-circle"></i> Voir tous les produits
+        </a>
+    <?php else: ?>
+        <a href="index.php?uc=gererProduit&action=afficher&filtre=stock_critique" class="btn btn-outline-danger shadow-sm">
+            <i class="bi bi-exclamation-triangle"></i> Stock critique
+        </a>
+    <?php endif; ?>
 </div>
+
+<?php
+// Filtrer les produits si filtre stock critique activé
+if (isset($_GET['filtre']) && $_GET['filtre'] === 'stock_critique') {
+    $lesProduits = array_filter($lesProduits, function($p) {
+        return (int)$p->stock < 5;
+    });
+    usort($lesProduits, function($a, $b) {
+        return (int)$a->stock - (int)$b->stock;
+    });
+}
+?>
+
+<?php if (isset($_GET['filtre']) && $_GET['filtre'] === 'stock_critique'): ?>
+    <div class="alert alert-warning text-center" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> Produits avec un stock en dessous de 5
+    </div>
+<?php endif; ?>
 
 <div id="liste-produits-gestion">
     <?php

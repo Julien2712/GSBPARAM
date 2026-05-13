@@ -65,6 +65,8 @@
                     <tr>
                         <th>ID Produit</th>
                         <th>Description</th>
+                        <th>Marque</th>
+                        <th>Catégorie</th>
                         <th class="text-center">Quantité</th>
                         <th class="text-end">Prix Unitaire</th>
                         <th class="text-end">Total</th>
@@ -80,6 +82,8 @@
                         <tr>
                             <td><?= htmlspecialchars($unDetail->id, ENT_QUOTES, 'UTF-8') ?></td>
                             <td><?= htmlspecialchars($unDetail->description, ENT_QUOTES, 'UTF-8') ?></td>
+                            <td><?= htmlspecialchars($unDetail->marque ?? '-', ENT_QUOTES, 'UTF-8') ?></td>
+                            <td><?= htmlspecialchars($unDetail->categorie ?? '-', ENT_QUOTES, 'UTF-8') ?></td>
                             <td class="text-center"><?= htmlspecialchars($unDetail->quantite, ENT_QUOTES, 'UTF-8') ?></td>
                             <td class="text-end"><?= number_format($unDetail->prix, 2, ',', ' ') ?> €</td>
                             <td class="text-end fw-bold"><?= number_format($totalLigne, 2, ',', ' ') ?> €</td>
@@ -88,7 +92,7 @@
                 </tbody>
                 <tfoot class="table-light">
                     <tr>
-                        <td colspan="4" class="text-end fw-bold">Total de la commande :</td>
+                        <td colspan="6" class="text-end fw-bold">Total de la commande :</td>
                         <td class="text-end fw-bold text-primary fs-5"><?= number_format($totalCommande, 2, ',', ' ') ?> €</td>
                     </tr>
                 </tfoot>

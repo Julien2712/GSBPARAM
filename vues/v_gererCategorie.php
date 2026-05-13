@@ -1,5 +1,19 @@
 <div class="alert alert-light" role="alert" id="categorie">Gérer les catégories :</div>
 
+<?php if (isset($_GET['succes']) && $_GET['succes'] === 'suppr'): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Succès !</strong> La catégorie a été supprimée.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['erreur']) && $_GET['erreur'] === 'non_vide'): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Erreur !</strong> Cette catégorie contient des produits et ne peut pas être supprimée.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
 <div class="mb-3 contenuCentre">
     <a href="index.php?uc=gererCategorie&action=afficherAjouter" class="btn btn-primary shadow-sm"">
         Créer une catégorie

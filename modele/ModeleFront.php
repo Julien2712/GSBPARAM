@@ -859,9 +859,12 @@ class ModeleFront extends Modele
 	public function getDetailsCommande($idCommande)
 	{
 		try {
-			$req = "SELECT p.prodId as id, p.prodDescription as description, p.prodPrix as prix, lc.ligneQuantite as quantite 
+			$req = "SELECT p.prodId as id, p.prodDescription as description, p.prodPrix as prix, lc.ligneQuantite as quantite,
+					m.marqueLibelle as marque, c.libelle as categorie
 					FROM lignecommande lc 
 					JOIN produit p ON lc.prodId = p.prodId 
+					LEFT JOIN marque m ON p.marqueID = m.marqueID
+					LEFT JOIN categorie c ON p.idCategorie = c.id
 					WHERE lc.panierID = :id";
 			$stmt = $this->getBdd()->prepare($req);
 			$stmt->execute([':id' => $idCommande]);
